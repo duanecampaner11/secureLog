@@ -1,0 +1,16 @@
+@model RegisterViewModel
+@{ ViewData["Title"] = "Register"; }
+<div class="card narrow">
+    <h1>Create account</h1>
+    <form asp-action="Register" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="alert error"></div>
+        <label>Full name</label><input asp-for="FullName" />
+        <label>Username</label><input asp-for="UserName" />
+        <label>Email</label><input asp-for="Email" />
+        <label>Password</label><input asp-for="Password" />
+        <label>Confirm password</label><input asp-for="ConfirmPassword" />
+        <button class="btn btn-primary" type="submit">Register</button>
+    </form>
+    <p>Already have an account? <a asp-action="Login">Login</a></p>
+</div>

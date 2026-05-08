@@ -1,0 +1,63 @@
+@model DashboardViewModel
+@{ ViewData["Title"] = "Dashboard"; }
+
+<div class="card">
+    <h1>Add Visitor</h1>
+    <form asp-controller="Guest" asp-action="Add" method="post" class="row-form">
+        @Html.AntiForgeryToken()
+        <input asp-for="NewGuest.Name" placeholder="Visitor name" required />
+        <input asp-for="NewGuest.Purpose" placeholder="Purpose of visit" required />
+        <button class="btn btn-primary" type="submit">TIME IN</button>
+    </form>
+</div>
+
+<div class="card">
+    <form asp-controller="Guest" asp-action="Index" method="get" class="row-form">
+        <input type="text" name="search" value="@Model.Search" placeholder="Search by name or date (yyyy-mm-dd)" />
+        <button class="btn" type="submit">SEARCH</button>
+        @if (!string.IsNullOrEmpty(Model.Search))
+        {
+            <a class="btn btn-ghost" asp-action="Index">Clear</a>
+        }
+    </form>
+
+    <table class="data">
+        <thead>
+            <tr>
+                <th>#</th><th>Name</th><th>Purpose</th><th>Time In</th><th>Time Out</th><th>Logged By</th><th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @if (!Model.Entries.Any())
+        {
+            <tr><td colspan="7" class="empty">No records found.</td></tr>
+        }
+        @foreach (var e in Model.Entries)
+        {
+            <tr>
+                <td>@e.Id</td>
+                <td>@e.Name</td>
+                <td>@e.Purpose</td>
+                <td>@e.TimeIn.ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@(e.TimeOut?.ToString("yyyy-MM-dd HH:mm") ?? "—")</td>
+                <td>@(Model.UserNames.TryGetValue(e.LoggedByUserId, out var n) ? n : "—")</td>
+                <td class="actions">
+                    @if (e.TimeOut == null)
+                    {
+                        <form asp-action="TimeOut" method="post" class="inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@e.Id" />
+                            <button class="btn btn-small" type="submit">TIME OUT</button>
+                        </form>
+                    }
+                    <form asp-action="Delete" method="post" class="inline" onsubmit="return confirm('Delete this entry?');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@e.Id" />
+                        <button class="btn btn-small btn-danger" type="submit">DELETE</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>

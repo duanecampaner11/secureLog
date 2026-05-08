@@ -1,0 +1,36 @@
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SecureLog</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header class="navbar">
+        <div class="brand"><a asp-controller="Home" asp-action="Index">🔐 SecureLog</a></div>
+        <nav>
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <span class="user">Hi, @User.Identity!.Name</span>
+                <form asp-controller="Account" asp-action="Logout" method="post" class="inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-ghost">Logout</button>
+                </form>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Login">Login</a>
+                <a asp-controller="Account" asp-action="Register">Register</a>
+            }
+        </nav>
+    </header>
+    <main class="container">
+        @if (TempData["Error"] != null) { <div class="alert error">@TempData["Error"]</div> }
+        @RenderBody()
+    </main>
+    <footer class="footer">© @DateTime.Now.Year SecureLog</footer>
+</body>
+</html>
