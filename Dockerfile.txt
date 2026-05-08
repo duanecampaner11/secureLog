@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy csproj file
+# Copy csproj file (use the exact name of your .csproj file)
 COPY SecureLog.csproj .
 RUN dotnet restore
 
@@ -14,6 +14,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/publish .
 
+# Set environment to production
 ENV ASPNETCORE_ENVIRONMENT=Production
 
 EXPOSE 80
