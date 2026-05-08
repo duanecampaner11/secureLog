@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+    options.UseNpgsql(connectionString));  // Changed from UseMySql to UseNpgsql
 
 // Add Identity services
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
@@ -19,7 +19,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
     options.Password.RequireUppercase = false;
     options.User.RequireUniqueEmail = true;
 })
-.AddRoles<IdentityRole>()  // Add this if you want roles
+.AddRoles<IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.ConfigureApplicationCookie(options =>
@@ -30,7 +30,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages(); // Needed for Identity UI pages
+builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
@@ -51,7 +51,7 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Guest}/{action=Index}/{id?}");
-app.MapRazorPages(); // Map Identity pages
+app.MapRazorPages();
 
 // Create database and apply migrations on startup
 using (var scope = app.Services.CreateScope())
@@ -64,7 +64,7 @@ using (var scope = app.Services.CreateScope())
     {
         await db.Database.MigrateAsync();
         
-        // Create default admin role and user (optional)
+        // Create default admin role and user
         if (!await roleManager.RoleExistsAsync("Admin"))
         {
             await roleManager.CreateAsync(new IdentityRole("Admin"));
@@ -79,7 +79,8 @@ using (var scope = app.Services.CreateScope())
                 UserName = "admin",
                 Email = adminEmail,
                 FullName = "System Administrator",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                IsApproved = true
             };
             await userManager.CreateAsync(adminUser, "Admin123!");
             await userManager.AddToRoleAsync(adminUser, "Admin");
