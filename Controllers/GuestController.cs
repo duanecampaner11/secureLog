@@ -67,7 +67,7 @@ public class GuestController : Controller
         {
             Name = vm.NewGuest.Name.Trim(),
             Purpose = vm.NewGuest.Purpose.Trim(),
-            TimeIn = DateTime.Now,
+            TimeIn = DateTime.UtcNow,        // CHANGED: Now using UtcNow
             LoggedByUserId = userId,
             LoggedAt = DateTime.UtcNow
         };
@@ -82,7 +82,7 @@ public class GuestController : Controller
         var entry = await _db.GuestEntries.FindAsync(id);
         if (entry != null && entry.TimeOut == null)
         {
-            entry.TimeOut = DateTime.Now;
+            entry.TimeOut = DateTime.UtcNow;  // CHANGED: Now using UtcNow
             await _db.SaveChangesAsync();
         }
         return RedirectToAction(nameof(Index));
