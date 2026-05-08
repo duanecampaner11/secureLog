@@ -54,49 +54,65 @@ public class GuestController : Controller
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Add(DashboardViewModel vm)
+public async Task<IActionResult> Add(DashboardViewModel vm)
+{
+    // DEBUG: Check if NewGuest is null
+    if (vm.NewGuest == null)
     {
-        if (!ModelState.IsValid)
-        {
-            TempData["Error"] = "Please enter a visitor name and purpose.";
-            return RedirectToAction(nameof(Index));
-        }
+        TempData["Error"] = "Debug: NewGuest is null";
+        return RedirectToAction(nameof(Index));
+    }
+    
+    // DEBUG: Check ModelState errors
+    if (!ModelState.IsValid)
+    {
+        var errors = string.Join("; ", ModelState.Values
+            .SelectMany(x => x.Errors)
+            .Select(x => x.ErrorMessage));
+        TempData["Error"] = $"Validation failed: {errors}";
+        return RedirectToAction(nameof(Index));
+    }
+    
+    // DEBUG: Check if fields are empty
+    if (string.IsNullOrWhiteSpace(vm.NewGuest.Name))
+    {
+        TempData["Error"] = "Debug: Name is empty";
+        return RedirectToAction(nameof(Index));
+    }
+    
+    if (string.IsNullOrWhiteSpace(vm.NewGuest.Purpose))
+    {
+        TempData["Error"] = "Debug: Purpose is empty";
+        return RedirectToAction(nameof(Index));
+    }
 
-        var userId = _userManager.GetUserId(User)!;
+    var userId = _userManager.GetUserId(User);
+    
+    // DEBUG: Check if user is logged in
+    if (string.IsNullOrEmpty(userId))
+    {
+        TempData["Error"] = "Debug: User not logged in";
+        return RedirectToAction(nameof(Index));
+    }
+    
+    try
+    {
         var entry = new GuestEntry
         {
             Name = vm.NewGuest.Name.Trim(),
             Purpose = vm.NewGuest.Purpose.Trim(),
-            TimeIn = DateTime.UtcNow,        // CHANGED: Now using UtcNow
+            TimeIn = DateTime.UtcNow,
             LoggedByUserId = userId,
             LoggedAt = DateTime.UtcNow
         };
         _db.GuestEntries.Add(entry);
         await _db.SaveChangesAsync();
+        TempData["Success"] = "Guest added successfully!";
         return RedirectToAction(nameof(Index));
     }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> TimeOut(int id)
+    catch (Exception ex)
     {
-        var entry = await _db.GuestEntries.FindAsync(id);
-        if (entry != null && entry.TimeOut == null)
-        {
-            entry.TimeOut = DateTime.UtcNow;  // CHANGED: Now using UtcNow
-            await _db.SaveChangesAsync();
-        }
+        TempData["Error"] = $"Database error: {ex.Message}";
         return RedirectToAction(nameof(Index));
     }
-
-    [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var entry = await _db.GuestEntries.FindAsync(id);
-        if (entry != null)
-        {
-            _db.GuestEntries.Remove(entry);
-            await _db.SaveChangesAsync();
-        }
-        return RedirectToAction(nameof(Index));
-    }
-}
+}}
