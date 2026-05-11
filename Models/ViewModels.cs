@@ -1,4 +1,3 @@
-@"
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Identity;
 
@@ -28,7 +27,7 @@ public class RegisterViewModel
 
     [Required]
     [DataType(DataType.Password)]
-    [Compare("Password")]
+    [Compare("Password", ErrorMessage = "Passwords do not match.")]
     public string ConfirmPassword { get; set; } = string.Empty;
 }
 
@@ -66,4 +65,3 @@ public class UserRoleViewModel
     public ApplicationUser User { get; set; }
     public List<string> Roles { get; set; } = new List<string>();
 }
-"@ | Out-File -FilePath "Models\ViewModels.cs" -Encoding utf8
