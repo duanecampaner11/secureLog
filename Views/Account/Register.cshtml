@@ -11,7 +11,6 @@
     <select id="roleSelect" class="form-control">
         <option value="Client">Client - Request visits</option>
         <option value="Guard">Guard - Front desk verification</option>
-        <option value="Admin">Admin - Manage system</option>
     </select>
 </div>
 
@@ -20,37 +19,37 @@
     
     <div class="mb-3">
         <label class="form-label">Full Name</label>
-        <input name="FullName" class="form-control" required />
+        <input asp-for="FullName" class="form-control" required />
     </div>
     
     <div class="mb-3">
         <label class="form-label">Username</label>
-        <input name="UserName" class="form-control" required />
+        <input asp-for="UserName" class="form-control" required />
     </div>
     
     <div class="mb-3">
         <label class="form-label">Email</label>
-        <input name="Email" type="email" class="form-control" required />
+        <input asp-for="Email" type="email" class="form-control" required />
     </div>
     
     <div class="mb-3">
         <label class="form-label">Company</label>
-        <input name="CompanyName" class="form-control" />
+        <input asp-for="CompanyName" class="form-control" />
     </div>
     
     <div class="mb-3">
         <label class="form-label">Phone</label>
-        <input name="PhoneNumber" class="form-control" />
+        <input asp-for="PhoneNumber" class="form-control" />
     </div>
     
     <div class="mb-3">
         <label class="form-label">Password</label>
-        <input name="Password" type="password" class="form-control" required />
+        <input asp-for="Password" type="password" class="form-control" required />
     </div>
     
     <div class="mb-3">
-        <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
-        <input name="ConfirmPassword" type="password" class="form-control" required />
+        <label class="form-label">Confirm Password</label>
+        <input asp-for="ConfirmPassword" type="password" class="form-control" required />
     </div>
     
     <input type="hidden" name="role" id="selectedRole" value="Client" />
