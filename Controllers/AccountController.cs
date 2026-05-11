@@ -33,25 +33,34 @@ public class AccountController : Controller
     {
         if (!ModelState.IsValid)
         {
+            foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+            {
+                Console.WriteLine($"ModelState Error: {error.ErrorMessage}");
+            }
             return View(model);
         }
-        
+
         var user = new ApplicationUser
         {
             UserName = model.UserName,
             Email = model.Email,
             FullName = model.FullName,
-            CompanyName = model.CompanyName,
-            PhoneNumber = model.PhoneNumber,
+            CompanyName = model.CompanyName ?? "",
+            PhoneNumber = model.PhoneNumber ?? "",
             IsApproved = true,
             CreatedAt = DateTime.UtcNow
         };
-        
+
         var result = await _userManager.CreateAsync(user, model.Password);
-        
+
         if (result.Succeeded)
         {
-            await _userManager.AddToRoleAsync(user, role);
+            // Assign role
+            if (!await _userManager.IsInRoleAsync(user, role))
+            {
+                await _userManager.AddToRoleAsync(user, role);
+            }
+            
             await _signInManager.SignInAsync(user, isPersistent: false);
             
             if (role == "Admin")
@@ -61,12 +70,13 @@ public class AccountController : Controller
             else
                 return RedirectToAction("Dashboard", "Client");
         }
-        
+
         foreach (var error in result.Errors)
         {
             ModelState.AddModelError(string.Empty, error.Description);
+            Console.WriteLine($"Create Error: {error.Description}");
         }
-        
+
         return View(model);
     }
 
@@ -84,7 +94,7 @@ public class AccountController : Controller
         {
             return View(model);
         }
-        
+
         var user = await _userManager.FindByNameAsync(model.UserName);
         
         if (user != null && !user.IsApproved)
@@ -94,7 +104,7 @@ public class AccountController : Controller
         }
         
         var result = await _signInManager.PasswordSignInAsync(model.UserName, model.Password, model.RememberMe, lockoutOnFailure: false);
-        
+
         if (result.Succeeded)
         {
             if (await _userManager.IsInRoleAsync(user!, "Admin"))
@@ -104,7 +114,7 @@ public class AccountController : Controller
             else
                 return RedirectToAction("Dashboard", "Client");
         }
-        
+
         ModelState.AddModelError(string.Empty, "Invalid login attempt.");
         return View(model);
     }
