@@ -5,16 +5,13 @@ using SecureLog.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Get the PORT from environment variable (Render sets this)
-var port = Environment.GetEnvironmentVariable(""PORT"") ?? ""8080"";
-builder.WebHost.UseUrls($""http://0.0.0.0:{port}"");
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
-// Add services to the container
-var connectionString = builder.Configuration.GetConnectionString(""DefaultConnection"");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-// Add Identity services
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
@@ -28,9 +25,9 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
-    options.LoginPath = ""/Account/Login"";
-    options.LogoutPath = ""/Account/Logout"";
-    options.AccessDeniedPath = ""/Account/AccessDenied"";
+    options.LoginPath = "/Account/Login";
+    options.LogoutPath = "/Account/Logout";
+    options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
 builder.Services.AddControllersWithViews();
@@ -38,10 +35,9 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler(""/Home/Error"");
+    app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
 
@@ -53,54 +49,50 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: ""default"",
-    pattern: ""{controller=Guest}/{action=Index}/{id?}"");
+    name: "default",
+    pattern: "{controller=Guest}/{action=Index}/{id?}");
 app.MapRazorPages();
 
-// Seed Roles and default users
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     
-    // Create roles
-    string[] roles = { ""Admin"", ""Guard"", ""Client"" };
+    string[] roles = { "Admin", "Guard", "Client" };
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))
             await roleManager.CreateAsync(new IdentityRole(role));
     }
     
-    // Create default Admin
-    var adminEmail = ""admin@securelog.com"";
+    var adminEmail = "admin@securelog.com";
     if (await userManager.FindByEmailAsync(adminEmail) == null)
     {
         var admin = new ApplicationUser
         {
-            UserName = ""admin"",
+            UserName = "admin",
             Email = adminEmail,
-            FullName = ""System Administrator"",
+            FullName = "System Administrator",
             IsApproved = true,
             CreatedAt = DateTime.UtcNow
         };
-        await userManager.CreateAsync(admin, ""Admin123!"");
-        await userManager.AddToRoleAsync(admin, ""Admin"");
+        await userManager.CreateAsync(admin, "Admin123!");
+        await userManager.AddToRoleAsync(admin, "Admin");
     }
     
-    // Create default Guard
-    var guardEmail = ""guard@securelog.com"";
+    var guardEmail = "guard@securelog.com";
     if (await userManager.FindByEmailAsync(guardEmail) == null)
     {
         var guard = new ApplicationUser
         {
-            UserName = ""guard"",
+            UserName = "guard",
             Email = guardEmail,
-            FullName = ""Security Guard"",
+            FullName = "Security Guard",
             IsApproved = true,
             CreatedAt = DateTime.UtcNow
         };
-        await userManager.CreateAsync(guard, ""Guard123!"");
-        await userManager.AddToRoleAsync(guard, ""Guard"");
+        await userManager.CreateAsync(guard, "Guard123!");
+        await userManager.AddToRoleAsync(guard, "Guard");
     }
 }
 
