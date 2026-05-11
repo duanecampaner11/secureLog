@@ -8,7 +8,9 @@ public class ApplicationUser : IdentityUser
     public DateTime CreatedAt { get; set; }
     public bool IsApproved { get; set; } = true;
     public string? CompanyName { get; set; }
-    public string? PhoneNumber { get; set; }
+    
+    [PersonalData]
+    public new string? PhoneNumber { get; set; }  // Added 'new' keyword
     
     // Navigation property for visit requests
     public virtual ICollection<VisitRequest>? VisitRequests { get; set; }

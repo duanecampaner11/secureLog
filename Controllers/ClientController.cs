@@ -23,6 +23,11 @@ public class ClientController : Controller
     public async Task<IActionResult> Dashboard()
     {
         var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+        
         var requests = await _db.VisitRequests
             .Where(r => r.ClientUserId == user.Id)
             .OrderByDescending(r => r.RequestedAt)
@@ -47,6 +52,10 @@ public class ClientController : Controller
         }
 
         var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
         
         var request = new VisitRequest
         {
@@ -73,6 +82,11 @@ public class ClientController : Controller
     public async Task<IActionResult> MyRequests()
     {
         var user = await _userManager.GetUserAsync(User);
+        if (user == null)
+        {
+            return RedirectToAction("Login", "Account");
+        }
+        
         var requests = await _db.VisitRequests
             .Where(r => r.ClientUserId == user.Id)
             .OrderByDescending(r => r.RequestedAt)
