@@ -1,25 +1,23 @@
+@"
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
 
 namespace SecureLog.Models;
 
 public class RegisterViewModel
 {
     [Required]
-    [Display(Name = "Full Name")]
     public string FullName { get; set; } = string.Empty;
 
     [Required]
-    [Display(Name = "Username")]
     public string UserName { get; set; } = string.Empty;
 
     [Required]
     [EmailAddress]
     public string Email { get; set; } = string.Empty;
 
-    [Display(Name = "Company Name")]
     public string? CompanyName { get; set; }
 
-    [Display(Name = "Phone Number")]
     [Phone]
     public string? PhoneNumber { get; set; }
 
@@ -30,7 +28,7 @@ public class RegisterViewModel
 
     [Required]
     [DataType(DataType.Password)]
-    [Compare("Password", ErrorMessage = "Passwords do not match.")]
+    [Compare("Password")]
     public string ConfirmPassword { get; set; } = string.Empty;
 }
 
@@ -62,3 +60,10 @@ public class DashboardViewModel
     public string? Search { get; set; }
     public Dictionary<string, string> UserNames { get; set; } = new();
 }
+
+public class UserRoleViewModel
+{
+    public ApplicationUser User { get; set; }
+    public List<string> Roles { get; set; } = new List<string>();
+}
+"@ | Out-File -FilePath "Models\ViewModels.cs" -Encoding utf8
