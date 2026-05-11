@@ -10,13 +10,17 @@
 {
     <div class="alert alert-danger">@TempData["Error"]</div>
 }
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
 
 <form method="post">
     @Html.AntiForgeryToken()
     
     <div class="mb-3">
-        <label class="form-label">Full Name *</label>
-        <input type="text" name="FullName" class="form-control" value="@Model?.FullName" required />
+        <label class="form-label">Full Name</label>
+        <input type="text" name="FullName" class="form-control" value="@Model?.FullName" />
     </div>
     
     <div class="mb-3">
@@ -25,26 +29,26 @@
     </div>
     
     <div class="mb-3">
-        <label class="form-label">Purpose of Visit *</label>
-        <textarea name="Purpose" class="form-control" rows="3" required>@Model?.Purpose</textarea>
+        <label class="form-label">Purpose of Visit</label>
+        <textarea name="Purpose" class="form-control" rows="3">@Model?.Purpose</textarea>
     </div>
     
     <div class="mb-3">
-        <label class="form-label">Person to Meet *</label>
-        <input type="text" name="PersonToMeet" class="form-control" value="@Model?.PersonToMeet" required />
+        <label class="form-label">Person to Meet</label>
+        <input type="text" name="PersonToMeet" class="form-control" value="@Model?.PersonToMeet" />
     </div>
     
     <div class="row">
         <div class="col-md-6">
             <div class="mb-3">
-                <label class="form-label">Visit Date *</label>
-                <input type="date" name="VisitDate" class="form-control" required />
+                <label class="form-label">Visit Date</label>
+                <input type="date" name="VisitDate" class="form-control" />
             </div>
         </div>
         <div class="col-md-6">
             <div class="mb-3">
-                <label class="form-label">Visit Time *</label>
-                <input type="time" name="VisitTime" class="form-control" required />
+                <label class="form-label">Visit Time</label>
+                <input type="time" name="VisitTime" class="form-control" />
             </div>
         </div>
     </div>
