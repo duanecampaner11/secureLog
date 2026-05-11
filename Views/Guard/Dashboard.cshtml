@@ -6,14 +6,23 @@
 
 <h2>Guard Dashboard</h2>
 
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-4">
         <div class="card">
             <div class="card-header bg-info">
                 <h4>Verify Visitor</h4>
             </div>
             <div class="card-body">
-                <form method="post" action="/Guard/VerifyVisitor">
+                <form method="post" asp-action="VerifyVisitor">
                     @Html.AntiForgeryToken()
                     <div class="mb-3">
                         <label class="form-label">Confirmation ID</label>
@@ -25,7 +34,7 @@
         </div>
     </div>
     
-    <div class="col-md-6">
+    <div class="col-md-8">
         <div class="card">
             <div class="card-header bg-success">
                 <h4>Today's Visits</h4>
@@ -33,26 +42,45 @@
             <div class="card-body">
                 @if (!Model.Any())
                 {
-                    <p>No visits today.</p>
+                    <p>No confirmed visits for today.</p>
                 }
                 else
                 {
-                    <table class="table">
+                    <table class="table table-striped">
                         <thead>
-                            <tr><th>ID</th><th>Name</th><th>Time</th><th>Status</th><th></th></tr>
+                            <tr>
+                                <th>Confirmation ID</th>
+                                <th>Name</th>
+                                <th>Company</th>
+                                <th>Purpose</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
                         </thead>
                         <tbody>
                             @foreach (var v in Model)
                             {
                                 <tr>
-                                    <td>@v.ConfirmationId</td>
-                                    <td>@v.FullName</td>
-                                    <td>@v.VisitTime.ToString("hh:mm tt")</td>
-                                    <td>@v.Status</td>
+                                    <td>@v.ConfirmationId</strong></td>
+                                    <td>@v.FullName</strong></td>
+                                    <td>@v.Company</strong></td>
+                                    <td>@v.Purpose</strong></td>
+                                    <td>@(v.VisitTime.HasValue ? v.VisitTime.Value.ToString("hh:mm tt") : "Not set")</strong></td>
                                     <td>
                                         @if (v.Status == RequestStatus.Confirmed)
                                         {
-                                            <form method="post" action="/Guard/CheckIn" style="display:inline">
+                                            <span class="badge bg-success">Waiting</span>
+                                        }
+                                        else if (v.Status == RequestStatus.CheckedIn)
+                                        {
+                                            <span class="badge bg-info">Checked In</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (v.Status == RequestStatus.Confirmed)
+                                        {
+                                            <form method="post" asp-action="CheckIn" style="display:inline">
                                                 @Html.AntiForgeryToken()
                                                 <input type="hidden" name="id" value="@v.Id" />
                                                 <button type="submit" class="btn btn-sm btn-primary">Check In</button>
@@ -60,7 +88,7 @@
                                         }
                                         else if (v.Status == RequestStatus.CheckedIn)
                                         {
-                                            <form method="post" action="/Guard/CheckOut" style="display:inline">
+                                            <form method="post" asp-action="CheckOut" style="display:inline">
                                                 @Html.AntiForgeryToken()
                                                 <input type="hidden" name="id" value="@v.Id" />
                                                 <button type="submit" class="btn btn-sm btn-secondary">Check Out</button>
