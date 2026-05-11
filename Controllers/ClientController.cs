@@ -59,6 +59,17 @@ public class ClientController : Controller
                 return RedirectToAction("Login", "Account");
             }
             
+            // Convert to UTC for PostgreSQL
+            DateTime visitDate;
+            if (model.VisitDate == default)
+            {
+                visitDate = DateTime.UtcNow.Date.AddDays(7);
+            }
+            else
+            {
+                visitDate = DateTime.SpecifyKind(model.VisitDate, DateTimeKind.Utc);
+            }
+            
             var request = new VisitRequest
             {
                 ClientUserId = user.Id,
@@ -66,7 +77,7 @@ public class ClientController : Controller
                 Company = model.Company,
                 Purpose = string.IsNullOrWhiteSpace(model.Purpose) ? "Not specified" : model.Purpose,
                 PersonToMeet = string.IsNullOrWhiteSpace(model.PersonToMeet) ? "Not specified" : model.PersonToMeet,
-                VisitDate = model.VisitDate == default ? DateTime.Today : model.VisitDate,
+                VisitDate = visitDate,
                 Notes = model.Notes,
                 Status = RequestStatus.Pending,
                 RequestedAt = DateTime.UtcNow

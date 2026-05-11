@@ -19,7 +19,7 @@ public class GuardController : Controller
 
     public async Task<IActionResult> Dashboard()
     {
-        var today = DateTime.Today;
+        var today = DateTime.UtcNow.Date;
         var visits = await _db.VisitRequests
             .Where(v => v.VisitDate.Date == today && 
                        (v.Status == RequestStatus.Confirmed || v.Status == RequestStatus.CheckedIn))
@@ -53,7 +53,7 @@ public class GuardController : Controller
             return RedirectToAction(nameof(Dashboard));
         }
 
-        if (visit.VisitDate.Date != DateTime.Today)
+        if (visit.VisitDate.Date != DateTime.UtcNow.Date)
         {
             TempData["Error"] = $"Valid only for {visit.VisitDate:yyyy-MM-dd}";
             return RedirectToAction(nameof(Dashboard));
