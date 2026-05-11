@@ -22,15 +22,23 @@ public class ClientController : Controller
     [HttpGet]
     public async Task<IActionResult> Dashboard()
     {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null) return RedirectToAction("Login", "Account");
-        
-        var requests = await _db.VisitRequests
-            .Where(r => r.ClientUserId == user.Id)
-            .OrderByDescending(r => r.RequestedAt)
-            .ToListAsync();
+        try
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return RedirectToAction("Login", "Account");
             
-        return View(requests);
+            var requests = await _db.VisitRequests
+                .Where(r => r.ClientUserId == user.Id)
+                .OrderByDescending(r => r.RequestedAt)
+                .ToListAsync();
+                
+            return View(requests);
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"Error loading dashboard: {ex.Message}";
+            return View(new List<VisitRequest>());
+        }
     }
 
     [HttpGet]
@@ -43,29 +51,23 @@ public class ClientController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateRequest(VisitRequest model)
     {
-        if (!ModelState.IsValid)
-        {
-            TempData["Error"] = "Please fill in all required fields.";
-            return View(model);
-        }
-        
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null)
-        {
-            return RedirectToAction("Login", "Account");
-        }
-        
         try
         {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            
             var request = new VisitRequest
             {
                 ClientUserId = user.Id,
-                FullName = model.FullName,
+                FullName = string.IsNullOrWhiteSpace(model.FullName) ? "Not provided" : model.FullName,
                 Company = model.Company,
-                Purpose = model.Purpose,
-                PersonToMeet = model.PersonToMeet,
-                VisitDate = model.VisitDate,
-                VisitTime = model.VisitTime,
+                Purpose = string.IsNullOrWhiteSpace(model.Purpose) ? "Not specified" : model.Purpose,
+                PersonToMeet = string.IsNullOrWhiteSpace(model.PersonToMeet) ? "Not specified" : model.PersonToMeet,
+                VisitDate = model.VisitDate ?? DateTime.Today.AddDays(7),
+                VisitTime = model.VisitTime ?? DateTime.Now,
                 Notes = model.Notes,
                 Status = RequestStatus.Pending,
                 RequestedAt = DateTime.UtcNow
@@ -80,7 +82,7 @@ public class ClientController : Controller
         catch (Exception ex)
         {
             TempData["Error"] = $"Error: {ex.Message}";
-            return View(model);
+            return RedirectToAction(nameof(CreateRequest));
         }
     }
 }
