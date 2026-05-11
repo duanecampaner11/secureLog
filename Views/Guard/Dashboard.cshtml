@@ -4,43 +4,49 @@
     ViewData["Title"] = "Guard Dashboard";
 }
 
-<div class=""container"">
+<div class="container">
     <h2>Guard Dashboard</h2>
     
-    <div class=""row"">
-        <div class=""col-md-6"">
-            <div class=""card"">
-                <div class=""card-header bg-info text-white"">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-info text-white">
                     <h4>Verify Visitor</h4>
                 </div>
-                <div class=""card-body"">
-                    <form method=""post"" asp-action=""VerifyVisitor"">
+                <div class="card-body">
+                    <form method="post" asp-action="VerifyVisitor">
                         @Html.AntiForgeryToken()
-                        <div class=""mb-3"">
-                            <label class=""form-label"">Confirmation ID</label>
-                            <input type=""text"" name=""confirmationId"" class=""form-control"" required />
+                        <div class="mb-3">
+                            <label class="form-label">Confirmation ID</label>
+                            <input type="text" name="confirmationId" class="form-control" required />
                         </div>
-                        <button type=""submit"" class=""btn btn-primary w-100"">Verify</button>
+                        <button type="submit" class="btn btn-primary w-100">Verify</button>
                     </form>
                 </div>
             </div>
         </div>
         
-        <div class=""col-md-6"">
-            <div class=""card"">
-                <div class=""card-header bg-success text-white"">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
                     <h4>Today's Confirmed Visits</h4>
                 </div>
-                <div class=""card-body"">
+                <div class="card-body">
                     @if (!Model.Any())
                     {
                         <p>No confirmed visits for today.</p>
                     }
                     else
                     {
-                        <table class=""table table-sm"">
+                        <table class="table table-sm">
                             <thead>
-                                <tr><th>Confirmation ID</th><th>Name</th><th>Time</th><th>Status</th><th>Action</th></tr>
+                                <tr>
+                                    <th>Confirmation ID</th>
+                                    <th>Name</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
                             </thead>
                             <tbody>
                                 @foreach (var v in Model)
@@ -48,43 +54,42 @@
                                     <tr>
                                         <td><strong>@v.ConfirmationId</strong></td>
                                         <td>@v.FullName</td>
-                                        <td>@v.VisitTime.ToString(""hh:mm tt"")</td>
+                                        <td>@v.VisitTime.ToString("hh:mm tt")</td>
                                         <td>
                                             @if (v.Status == RequestStatus.Confirmed)
                                             {
-                                                <span class=""badge bg-success"">Waiting</span>
+                                                <span class="badge bg-success">Waiting</span>
                                             }
                                             else if (v.Status == RequestStatus.CheckedIn)
                                             {
-                                                <span class=""badge bg-info"">Checked In</span>
+                                                <span class="badge bg-info">Checked In</span>
                                             }
                                             else
                                             {
-                                                <span class=""badge bg-secondary"">Completed</span>
+                                                <span class="badge bg-secondary">Completed</span>
                                             }
                                         </td>
                                         <td>
                                             @if (v.Status == RequestStatus.Confirmed)
                                             {
-                                                <form method=""post"" asp-action=""CheckIn"" style=""display:inline"">
+                                                <form method="post" asp-action="CheckIn" style="display:inline">
                                                     @Html.AntiForgeryToken()
-                                                    <input type=""hidden"" name=""id"" value=""@v.Id"" />
-                                                    <button type=""submit"" class=""btn btn-sm btn-primary"">Check In</button>
+                                                    <input type="hidden" name="id" value="@v.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-primary">Check In</button>
                                                 </form>
                                             }
                                             else if (v.Status == RequestStatus.CheckedIn)
                                             {
-                                                <form method=""post"" asp-action=""CheckOut"" style=""display:inline"">
+                                                <form method="post" asp-action="CheckOut" style="display:inline">
                                                     @Html.AntiForgeryToken()
-                                                    <input type=""hidden"" name=""id"" value=""@v.Id"" />
-                                                    <button type=""submit"" class=""btn btn-sm btn-secondary"">Check Out</button>
+                                                    <input type="hidden" name="id" value="@v.Id" />
+                                                    <button type="submit" class="btn btn-sm btn-secondary">Check Out</button>
                                                 </form>
                                             }
                                         </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                                    }
+                                </tbody>
+                            </table>
                     }
                 </div>
             </div>
