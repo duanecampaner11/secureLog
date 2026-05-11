@@ -8,7 +8,7 @@ public class VisitRequest
     [Key]
     public int Id { get; set; }
     
-    public string? ClientUserId { get; set; }  // Changed from int? to string?
+    public string? ClientUserId { get; set; }
     
     [ForeignKey("ClientUserId")]
     public virtual ApplicationUser? ClientUser { get; set; }
@@ -17,8 +17,10 @@ public class VisitRequest
     public string? Company { get; set; }
     public string? Purpose { get; set; }
     public string? PersonToMeet { get; set; }
-    public DateTime VisitDate { get; set; }
-    public DateTime? VisitTime { get; set; }
+    
+    [Required]
+    public DateTime VisitDate { get; set; } = DateTime.UtcNow;
+    
     public string? Notes { get; set; }
     
     public RequestStatus Status { get; set; } = RequestStatus.Pending;
@@ -33,6 +35,9 @@ public class VisitRequest
     public DateTime? CheckInTime { get; set; }
     public DateTime? CheckOutTime { get; set; }
     public string? ReturnReason { get; set; }
+    
+    // Provide default value for VisitTime (if database requires it)
+    public DateTime VisitTime { get; set; } = DateTime.UtcNow;
 }
 
 public enum RequestStatus

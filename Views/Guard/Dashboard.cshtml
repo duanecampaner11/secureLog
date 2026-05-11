@@ -37,12 +37,12 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header bg-success">
-                <h4>Today's Visits</h4>
+                <h4>Confirmed Visits (Today & Upcoming)</h4>
             </div>
             <div class="card-body">
                 @if (!Model.Any())
                 {
-                    <p>No confirmed visits for today.</p>
+                    <p>No confirmed visits.</p>
                 }
                 else
                 {
@@ -53,7 +53,7 @@
                                 <th>Name</th>
                                 <th>Company</th>
                                 <th>Purpose</th>
-                                <th>Time</th>
+                                <th>Visit Date</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -62,12 +62,21 @@
                             @foreach (var v in Model)
                             {
                                 <tr>
-                                    <td>@v.ConfirmationId</td>
-                                    <td>@v.FullName</td>
-                                    <td>@v.Company</td>
-                                    <td>@v.Purpose</td>
-                                    <td>@(v.VisitTime.HasValue ? v.VisitTime.Value.ToString("hh:mm tt") : "Not set")</td>
-                                    <td>@v.Status</td>
+                                    <td>@v.ConfirmationId</strong></td>
+                                    <td>@v.FullName</strong></td>
+                                    <td>@v.Company</strong></td>
+                                    <td>@v.Purpose</strong></td>
+                                    <td>@v.VisitDate.ToString("yyyy-MM-dd")</strong></td>
+                                    <td>
+                                        @if (v.Status == RequestStatus.Confirmed)
+                                        {
+                                            <span class="badge bg-success">Confirmed</span>
+                                        }
+                                        else if (v.Status == RequestStatus.CheckedIn)
+                                        {
+                                            <span class="badge bg-info">Checked In</span>
+                                        }
+                                    </td>
                                     <td>
                                         @if (v.Status == RequestStatus.Confirmed)
                                         {

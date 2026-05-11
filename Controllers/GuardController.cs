@@ -20,10 +20,12 @@ public class GuardController : Controller
     public async Task<IActionResult> Dashboard()
     {
         var today = DateTime.UtcNow.Date;
+        // Show today's visits AND future visits (upcoming 7 days)
         var visits = await _db.VisitRequests
-            .Where(v => v.VisitDate.Date == today && 
+            .Where(v => v.VisitDate.Date >= today && 
                        (v.Status == RequestStatus.Confirmed || v.Status == RequestStatus.CheckedIn))
             .OrderBy(v => v.VisitDate)
+            .Take(50)
             .ToListAsync();
         return View(visits);
     }
@@ -47,19 +49,20 @@ public class GuardController : Controller
             return RedirectToAction(nameof(Dashboard));
         }
 
-        if (visit.Status != RequestStatus.Confirmed)
+        if (visit.Status != RequestStatus.Confirmed && visit.Status != RequestStatus.CheckedIn)
         {
             TempData["Error"] = $"This request is {visit.Status}. Access denied.";
             return RedirectToAction(nameof(Dashboard));
         }
 
-        if (visit.VisitDate.Date != DateTime.UtcNow.Date)
+        // Check if visit date is today or future
+        if (visit.VisitDate.Date < DateTime.UtcNow.Date)
         {
-            TempData["Error"] = $"Valid only for {visit.VisitDate:yyyy-MM-dd}";
+            TempData["Error"] = $"This confirmation expired on {visit.VisitDate:yyyy-MM-dd}";
             return RedirectToAction(nameof(Dashboard));
         }
 
-        TempData["Success"] = $"Valid visitor: {visit.FullName} - {visit.Purpose}";
+        TempData["Success"] = $"Valid visitor: {visit.FullName} - {visit.Purpose} (Date: {visit.VisitDate:yyyy-MM-dd})";
         return RedirectToAction(nameof(Dashboard));
     }
 
