@@ -37,11 +37,11 @@ else
             @foreach (var request in Model)
             {
                 <tr>
-                    <td>@(request.VisitDate.HasValue ? request.VisitDate.Value.ToString("yyyy-MM-dd") : "Not set")</strong></td>
-                    <td>@request.Purpose</strong></td>
-                    <td>@request.PersonToMeet</strong></td>
-                    <td><span class="badge bg-warning">@request.Status</span></td>
-                    <td>@request.ConfirmationId</strong></td>
+                    <td>@(request.VisitDate.HasValue ? request.VisitDate.Value.ToString("yyyy-MM-dd") : "Not set")</td>
+                    <td>@request.Purpose</td>
+                    <td>@request.PersonToMeet</td>
+                    <td>@request.Status</td>
+                    <td>@request.ConfirmationId</td>
                 </tr>
             }
         </tbody>

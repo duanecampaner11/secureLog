@@ -62,12 +62,12 @@
                             @foreach (var v in Model)
                             {
                                 <tr>
-                                    <td>@v.ConfirmationId</strong></td>
-                                    <td>@v.FullName</strong></td>
-                                    <td>@v.Company</strong></td>
-                                    <td>@v.Purpose</strong></td>
-                                    <td>@(v.VisitTime.HasValue ? v.VisitTime.Value.ToString("hh:mm tt") : "Not set")</strong></td>
-                                    <td><span class="badge bg-success">@v.Status</span></td>
+                                    <td>@v.ConfirmationId</td>
+                                    <td>@v.FullName</td>
+                                    <td>@v.Company</td>
+                                    <td>@v.Purpose</td>
+                                    <td>@(v.VisitTime.HasValue ? v.VisitTime.Value.ToString("hh:mm tt") : "Not set")</td>
+                                    <td>@v.Status</td>
                                     <td>
                                         @if (v.Status == RequestStatus.Confirmed)
                                         {
