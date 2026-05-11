@@ -1,4 +1,8 @@
-﻿@model List<VisitRequest>
+@model List<VisitRequest>
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
 
 <h2>Admin Dashboard</h2>
 
@@ -10,9 +14,15 @@
 }
 else
 {
-    <table class=""table"">
+    <table class="table">
         <thead>
-            <tr><th>Client</th><th>Name</th><th>Date</th><th>Purpose</th><th>Action</th></tr>
+            <tr>
+                <th>Client</th>
+                <th>Name</th>
+                <th>Date</th>
+                <th>Purpose</th>
+                <th>Action</th>
+            </tr>
         </thead>
         <tbody>
             @foreach (var request in Model)
@@ -20,15 +30,15 @@ else
                 <tr>
                     <td>@request.ClientUser?.Email</td>
                     <td>@request.FullName</td>
-                    <td>@request.VisitDate.ToString(""yyyy-MM-dd"")</td>
+                    <td>@request.VisitDate.ToString("yyyy-MM-dd")</td>
                     <td>@request.Purpose</td>
                     <td>
-                        <form method=""post"" style=""display:inline"">
+                        <form method="post" style="display:inline">
                             @Html.AntiForgeryToken()
-                            <input type=""hidden"" name=""id"" value=""@request.Id"" />
-                            <button type=""submit"" formaction=""/Admin/ConfirmRequest"" class=""btn btn-sm btn-success"">Confirm</button>
+                            <input type="hidden" name="id" value="@request.Id" />
+                            <button type="submit" formaction="/Admin/ConfirmRequest" class="btn btn-sm btn-success">Confirm</button>
                         </form>
-                        <button type=""button"" class=""btn btn-sm btn-danger"" onclick=""showReturnModal(@request.Id)"">Return</button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="alert('Return reason modal would go here')">Return</button>
                     </td>
                 </tr>
             }

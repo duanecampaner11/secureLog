@@ -1,38 +1,45 @@
-﻿@model List<VisitRequest>
+@model List<VisitRequest>
+
+@{
+    ViewData["Title"] = "Guard Dashboard";
+}
 
 <h2>Guard Dashboard</h2>
 
-<div class=""row"">
-    <div class=""col-md-6"">
-        <div class=""card"">
-            <div class=""card-header bg-info"">
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-info">
                 <h4>Verify Visitor</h4>
             </div>
-            <div class=""card-body"">
-                <form method=""post"" action=""/Guard/VerifyVisitor"">
+            <div class="card-body">
+                <form method="post" action="/Guard/VerifyVisitor">
                     @Html.AntiForgeryToken()
-                    <input type=""text"" name=""confirmationId"" class=""form-control"" placeholder=""Confirmation ID"" required />
-                    <button type=""submit"" class=""btn btn-primary mt-2"">Verify</button>
+                    <div class="mb-3">
+                        <label class="form-label">Confirmation ID</label>
+                        <input type="text" name="confirmationId" class="form-control" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Verify</button>
                 </form>
             </div>
         </div>
     </div>
     
-    <div class=""col-md-6"">
-        <div class=""card"">
-            <div class=""card-header bg-success"">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-success">
                 <h4>Today's Visits</h4>
             </div>
-            <div class=""card-body"">
+            <div class="card-body">
                 @if (!Model.Any())
                 {
                     <p>No visits today.</p>
                 }
                 else
                 {
-                    <table class=""table"">
+                    <table class="table">
                         <thead>
-                            <tr><th>ID</th><th>Name</th><th>Time</th><th>Status</th><th>Action</th></tr>
+                            <tr><th>ID</th><th>Name</th><th>Time</th><th>Status</th><th></th></tr>
                         </thead>
                         <tbody>
                             @foreach (var v in Model)
@@ -40,23 +47,23 @@
                                 <tr>
                                     <td>@v.ConfirmationId</td>
                                     <td>@v.FullName</td>
-                                    <td>@v.VisitTime.ToString(""hh:mm tt"")</td>
+                                    <td>@v.VisitTime.ToString("hh:mm tt")</td>
                                     <td>@v.Status</td>
                                     <td>
                                         @if (v.Status == RequestStatus.Confirmed)
                                         {
-                                            <form method=""post"" action=""/Guard/CheckIn"" style=""display:inline"">
+                                            <form method="post" action="/Guard/CheckIn" style="display:inline">
                                                 @Html.AntiForgeryToken()
-                                                <input type=""hidden"" name=""id"" value=""@v.Id"" />
-                                                <button type=""submit"" class=""btn btn-sm btn-primary"">Check In</button>
+                                                <input type="hidden" name="id" value="@v.Id" />
+                                                <button type="submit" class="btn btn-sm btn-primary">Check In</button>
                                             </form>
                                         }
                                         else if (v.Status == RequestStatus.CheckedIn)
                                         {
-                                            <form method=""post"" action=""/Guard/CheckOut"" style=""display:inline"">
+                                            <form method="post" action="/Guard/CheckOut" style="display:inline">
                                                 @Html.AntiForgeryToken()
-                                                <input type=""hidden"" name=""id"" value=""@v.Id"" />
-                                                <button type=""submit"" class=""btn btn-sm btn-secondary"">Check Out</button>
+                                                <input type="hidden" name="id" value="@v.Id" />
+                                                <button type="submit" class="btn btn-sm btn-secondary">Check Out</button>
                                             </form>
                                         }
                                     </td>

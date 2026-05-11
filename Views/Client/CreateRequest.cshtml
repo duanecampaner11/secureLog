@@ -1,46 +1,50 @@
-﻿@model VisitRequest
+@model VisitRequest
+
+@{
+    ViewData["Title"] = "Create Visit Request";
+}
 
 <h2>Create Visit Request</h2>
 
-<form method=""post"">
+<form asp-action="CreateRequest" method="post">
     @Html.AntiForgeryToken()
     
-    <div class=""mb-3"">
-        <label class=""form-label"">Full Name</label>
-        <input asp-for=""FullName"" class=""form-control"" required />
+    <div class="mb-3">
+        <label asp-for="FullName" class="form-label">Full Name</label>
+        <input asp-for="FullName" class="form-control" required />
     </div>
     
-    <div class=""mb-3"">
-        <label class=""form-label"">Company</label>
-        <input asp-for=""Company"" class=""form-control"" />
+    <div class="mb-3">
+        <label asp-for="Company" class="form-label">Company</label>
+        <input asp-for="Company" class="form-control" />
     </div>
     
-    <div class=""mb-3"">
-        <label class=""form-label"">Purpose</label>
-        <textarea asp-for=""Purpose"" class=""form-control"" rows=""3"" required></textarea>
+    <div class="mb-3">
+        <label asp-for="Purpose" class="form-label">Purpose</label>
+        <textarea asp-for="Purpose" class="form-control" rows="3" required></textarea>
     </div>
     
-    <div class=""mb-3"">
-        <label class=""form-label"">Person to Meet</label>
-        <input asp-for=""PersonToMeet"" class=""form-control"" required />
+    <div class="mb-3">
+        <label asp-for="PersonToMeet" class="form-label">Person to Meet</label>
+        <input asp-for="PersonToMeet" class="form-control" required />
     </div>
     
-    <div class=""row"">
-        <div class=""col-md-6"">
-            <label class=""form-label"">Visit Date</label>
-            <input asp-for=""VisitDate"" type=""date"" class=""form-control"" required />
+    <div class="row">
+        <div class="col-md-6">
+            <label asp-for="VisitDate" class="form-label">Visit Date</label>
+            <input asp-for="VisitDate" type="date" class="form-control" required />
         </div>
-        <div class=""col-md-6"">
-            <label class=""form-label"">Visit Time</label>
-            <input asp-for=""VisitTime"" type=""time"" class=""form-control"" required />
+        <div class="col-md-6">
+            <label asp-for="VisitTime" class="form-label">Visit Time</label>
+            <input asp-for="VisitTime" type="time" class="form-control" required />
         </div>
     </div>
     
-    <div class=""mb-3"">
-        <label class=""form-label"">Notes</label>
-        <textarea asp-for=""Notes"" class=""form-control"" rows=""2""></textarea>
+    <div class="mb-3">
+        <label asp-for="Notes" class="form-label">Notes</label>
+        <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
     </div>
     
-    <button type=""submit"" class=""btn btn-primary"">Submit</button>
-    <a href=""/Client/Dashboard"" class=""btn btn-secondary"">Cancel</a>
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <a href="/Client/Dashboard" class="btn btn-secondary">Cancel</a>
 </form>
