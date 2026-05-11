@@ -48,48 +48,50 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Guest}/{action=Index}/{id?}");
-app.MapRazorPages();
-
-// Create database and apply migrations on startup
+// After app.UseAuthorization();
+// Seed Roles
 using (var scope = app.Services.CreateScope())
 {
-    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     
-    try
+    // Create roles
+    string[] roles = { "Admin", "Guard", "Client" };
+    foreach (var role in roles)
     {
-        await db.Database.MigrateAsync();
-        
-        // Create default admin role and user
-        if (!await roleManager.RoleExistsAsync("Admin"))
-        {
-            await roleManager.CreateAsync(new IdentityRole("Admin"));
-        }
-        
-        // Create default admin user if none exists
-        var adminEmail = "admin@securelog.com";
-        if (await userManager.FindByEmailAsync(adminEmail) == null)
-        {
-            var adminUser = new ApplicationUser
-            {
-                UserName = "admin",
-                Email = adminEmail,
-                FullName = "System Administrator",
-                CreatedAt = DateTime.UtcNow,
-                IsApproved = true
-            };
-            await userManager.CreateAsync(adminUser, "Admin123!");
-            await userManager.AddToRoleAsync(adminUser, "Admin");
-        }
+        if (!await roleManager.RoleExistsAsync(role))
+            await roleManager.CreateAsync(new IdentityRole(role));
     }
-    catch (Exception ex)
+    
+    // Create default Admin
+    var adminEmail = "admin@securelog.com";
+    if (await userManager.FindByEmailAsync(adminEmail) == null)
     {
-        Console.WriteLine($"An error occurred while migrating: {ex.Message}");
+        var admin = new ApplicationUser
+        {
+            UserName = "admin",
+            Email = adminEmail,
+            FullName = "System Administrator",
+            IsApproved = true,
+            CreatedAt = DateTime.UtcNow
+        };
+        await userManager.CreateAsync(admin, "Admin123!");
+        await userManager.AddToRoleAsync(admin, "Admin");
+    }
+    
+    // Create default Guard
+    var guardEmail = "guard@securelog.com";
+    if (await userManager.FindByEmailAsync(guardEmail) == null)
+    {
+        var guard = new ApplicationUser
+        {
+            UserName = "guard",
+            Email = guardEmail,
+            FullName = "Security Guard",
+            IsApproved = true,
+            CreatedAt = DateTime.UtcNow
+        };
+        await userManager.CreateAsync(guard, "Guard123!");
+        await userManager.AddToRoleAsync(guard, "Guard");
     }
 }
-
-app.Run();
