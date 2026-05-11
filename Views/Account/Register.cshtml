@@ -1,62 +1,62 @@
-﻿@model RegisterViewModel
+@model RegisterViewModel
 
 @{
-    ViewData[""Title""] = ""Register"";
+    ViewData["Title"] = "Register";
 }
 
 <h2>Create Account</h2>
 
-<div class=""alert alert-info"">
+<div class="alert alert-info">
     <strong>Account Type:</strong>
-    <select id=""roleSelect"" class=""form-control"">
-        <option value=""Client"">Client - Request visits</option>
-        <option value=""Guard"">Guard - Front desk verification</option>
-        <option value=""Admin"">Admin - Manage system</option>
+    <select id="roleSelect" class="form-control">
+        <option value="Client">Client - Request visits</option>
+        <option value="Guard">Guard - Front desk verification</option>
+        <option value="Admin">Admin - Manage system</option>
     </select>
 </div>
 
-<form method=""post"">
+<form method="post">
     @Html.AntiForgeryToken()
     
-    <div class=""mb-3"">
-        <label class=""form-label"">Full Name</label>
-        <input asp-for=""FullName"" class=""form-control"" required />
+    <div class="mb-3">
+        <label class="form-label">Full Name</label>
+        <input name="FullName" class="form-control" required />
     </div>
     
-    <div class=""mb-3"">
-        <label class=""form-label"">Username</label>
-        <input asp-for=""UserName"" class=""form-control"" required />
+    <div class="mb-3">
+        <label class="form-label">Username</label>
+        <input name="UserName" class="form-control" required />
     </div>
     
-    <div class=""mb-3"">
-        <label class=""form-label"">Email</label>
-        <input asp-for=""Email"" type=""email"" class=""form-control"" required />
+    <div class="mb-3">
+        <label class="form-label">Email</label>
+        <input name="Email" type="email" class="form-control" required />
     </div>
     
-    <div class=""mb-3"">
-        <label class=""form-label"">Company</label>
-        <input asp-for=""CompanyName"" class=""form-control"" />
+    <div class="mb-3">
+        <label class="form-label">Company</label>
+        <input name="CompanyName" class="form-control" />
     </div>
     
-    <div class=""mb-3"">
-        <label class=""form-label"">Phone</label>
-        <input asp-for=""PhoneNumber"" class=""form-control"" />
+    <div class="mb-3">
+        <label class="form-label">Phone</label>
+        <input name="PhoneNumber" class="form-control" />
     </div>
     
-    <div class=""mb-3"">
-        <label class=""form-label"">Password</label>
-        <input asp-for=""Password"" type=""password"" class=""form-control"" required />
+    <div class="mb-3">
+        <label class="form-label">Password</label>
+        <input name="Password" type="password" class="form-control" required />
     </div>
     
-    <div class=""mb-3"">
-        <label class=""form-label"">Confirm Password</label>
-        <input asp-for=""ConfirmPassword"" type=""password"" class=""form-control"" required />
+    <div class="mb-3">
+        <label asp-for="ConfirmPassword" class="form-label">Confirm Password</label>
+        <input name="ConfirmPassword" type="password" class="form-control" required />
     </div>
     
-    <input type=""hidden"" name=""role"" id=""selectedRole"" value=""Client"" />
+    <input type="hidden" name="role" id="selectedRole" value="Client" />
     
-    <button type=""submit"" class=""btn btn-primary"">Register</button>
-    <a href=""/Account/Login"" class=""btn btn-secondary"">Cancel</a>
+    <button type="submit" class="btn btn-primary">Register</button>
+    <a href="/Account/Login" class="btn btn-secondary">Cancel</a>
 </form>
 
 <script>
