@@ -1,152 +1,37 @@
-@model List<VisitRequest>
+﻿@model List<VisitRequest>
 
-@{
-    ViewData["Title"] = "Admin Dashboard";
-    var allUsers = ViewBag.AllUsers as List<ApplicationUser>;
+<h2>Admin Dashboard</h2>
+
+<h3>Pending Requests</h3>
+
+@if (!Model.Any())
+{
+    <p>No pending requests.</p>
 }
-
-@inject UserManager<ApplicationUser> UserManager
-
-<div class="container">
-    <h2>Admin Dashboard</h2>
-    
-    <!-- Pending Requests Section -->
-    <div class="card mb-4">
-        <div class="card-header bg-warning">
-            <h4>Pending Visit Requests</h4>
-        </div>
-        <div class="card-body">
-            @if (!Model.Any())
+else
+{
+    <table class=""table"">
+        <thead>
+            <tr><th>Client</th><th>Name</th><th>Date</th><th>Purpose</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+            @foreach (var request in Model)
             {
-                <p>No pending requests.</p>
+                <tr>
+                    <td>@request.ClientUser?.Email</td>
+                    <td>@request.FullName</td>
+                    <td>@request.VisitDate.ToString(""yyyy-MM-dd"")</td>
+                    <td>@request.Purpose</td>
+                    <td>
+                        <form method=""post"" style=""display:inline"">
+                            @Html.AntiForgeryToken()
+                            <input type=""hidden"" name=""id"" value=""@request.Id"" />
+                            <button type=""submit"" formaction=""/Admin/ConfirmRequest"" class=""btn btn-sm btn-success"">Confirm</button>
+                        </form>
+                        <button type=""button"" class=""btn btn-sm btn-danger"" onclick=""showReturnModal(@request.Id)"">Return</button>
+                    </td>
+                </tr>
             }
-            else
-            {
-                <div class="table-responsive">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Client</th>
-                                <th>Name</th>
-                                <th>Date</th>
-                                <th>Purpose</th>
-                                <th>Person to Meet</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var request in Model)
-                            {
-                                <tr>
-                                    <td>@request.ClientUser?.Email</td>
-                                    <td>@request.FullName</td>
-                                    <td>@request.VisitDate.ToString("yyyy-MM-dd")</td>
-                                    <td>@request.Purpose</td>
-                                    <td>@request.PersonToMeet</td>
-                                    <td>
-                                        <form method="post" style="display:inline">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@request.Id" />
-                                            <button type="submit" formaction="/Admin/ConfirmRequest" class="btn btn-sm btn-success">Confirm</button>
-                                        </form>
-                                        
-                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#returnModal_@request.Id">Return</button>
-                                        
-                                        <!-- Return Modal -->
-                                        <div class="modal fade" id="returnModal_@request.Id" tabindex="-1">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <form method="post" action="/Admin/ReturnRequest">
-                                                        @Html.AntiForgeryToken()
-                                                        <input type="hidden" name="id" value="@request.Id" />
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title">Return Request</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <label class="form-label">Reason for return:</label>
-                                                            <textarea name="returnReason" class="form-control" rows="3" required></textarea>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                            <button type="submit" class="btn btn-danger">Return Request</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-        </div>
-    </div>
-    
-    <!-- User Management Section -->
-    <div class="card">
-        <div class="card-header bg-info">
-            <h4>User Management</h4>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Email</th>
-                            <th>Full Name</th>
-                            <th>Company</th>
-                            <th>Role</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if (allUsers != null)
-                        {
-                            @foreach (var user in allUsers)
-                            {
-                                <tr>
-                                    <td>@user.Email</td>
-                                    <td>@user.FullName</td>
-                                    <td>@user.CompanyName</td>
-                                    <td>
-                                        @{
-                                            if (await UserManager.IsInRoleAsync(user, "Admin"))
-                                            {
-                                                <span class="badge bg-danger">Admin</span>
-                                            }
-                                            else if (await UserManager.IsInRoleAsync(user, "Guard"))
-                                            {
-                                                <span class="badge bg-primary">Guard</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-secondary">Client</span>
-                                            }
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (!await UserManager.IsInRoleAsync(user, "Admin"))
-                                        {
-                                            <form method="post" action="/Admin/DeleteUser" onsubmit="return confirm('Delete user @user.Email?')" style="display:inline">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="userId" value="@user.Id" />
-                                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                            </form>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">Cannot delete admin</span>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
+        </tbody>
+    </table>
+}
