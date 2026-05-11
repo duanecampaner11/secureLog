@@ -1,4 +1,4 @@
-﻿@model List<VisitRequest>
+@model List<VisitRequest>
 
 @{
     ViewData["Title"] = "Guard Dashboard";
@@ -15,83 +15,68 @@
     <div class="alert alert-success">@TempData["Success"]</div>
 }
 
-<div class="row">
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header bg-info">
-                <h4>Verify Visitor</h4>
-            </div>
-            <div class="card-body">
-                <form method="post" asp-action="VerifyVisitor">
-                    @Html.AntiForgeryToken()
-                    <div class="form-group">
-                        <label>Confirmation ID</label>
-                        <input type="text" name="confirmationId" class="form-control" required />
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-2">Verify</button>
-                </form>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header bg-success">
-                <h4>Confirmed Visits</h4>
-            </div>
-            <div class="card-body">
-                @if (!Model.Any())
-                {
-                    <p>No confirmed visits.</p>
-                }
-                else
-                {
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Confirmation ID</th>
-                                <th>Full Name</th>
-                                <th>Company</th>
-                                <th>Purpose</th>
-                                <th>Visit Date</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var visit in Model)
-                            {
-                                <tr>
-                                    <td>@visit.ConfirmationId</strong></td>
-                                    <td>@visit.FullName</strong></td>
-                                    <td>@visit.Company</strong></td>
-                                    <td>@visit.Purpose</strong></td>
-                                    <td>@visit.VisitDate.ToString("yyyy-MM-dd")</strong></td>
-                                    <td>@visit.Status</strong></td>
-                                    <td>
-                                        @if (visit.Status == RequestStatus.Confirmed)
-                                        {
-                                            <form method="post" asp-action="CheckIn">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@visit.Id" />
-                                                <button type="submit" class="btn btn-primary btn-sm">Check In</button>
-                                            </form>
-                                        }
-                                        else if (visit.Status == RequestStatus.CheckedIn)
-                                        {
-                                            <form method="post" asp-action="CheckOut">
-                                                @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@visit.Id" />
-                                                <button type="submit" class="btn btn-secondary btn-sm">Check Out</button>
-                                            </form>
-                                        }
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                }
-            </div>
-        </div>
-    </div>
+<div>
+    <h3>Verify Visitor</h3>
+    <form method="post" asp-action="VerifyVisitor">
+        @Html.AntiForgeryToken()
+        <label>Confirmation ID:</label>
+        <input type="text" name="confirmationId" required />
+        <button type="submit">Verify</button>
+    </form>
 </div>
+
+<hr />
+
+<h3>Confirmed Visits</h3>
+
+@if (!Model.Any())
+{
+    <p>No confirmed visits.</p>
+}
+else
+{
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Confirmation ID</th>
+                <th>Full Name</th>
+                <th>Company</th>
+                <th>Purpose</th>
+                <th>Visit Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var visit in Model)
+            {
+                <tr>
+                    <td>@visit.ConfirmationId</strong></td>
+                    <td>@visit.FullName</strong></td>
+                    <td>@visit.Company</strong></td>
+                    <td>@visit.Purpose</strong></td>
+                    <td>@visit.VisitDate.ToString("yyyy-MM-dd")</strong></td>
+                    <td>@visit.Status</strong></td>
+                    <td>
+                        @if (visit.Status == RequestStatus.Confirmed)
+                        {
+                            <form method="post" asp-action="CheckIn" style="display:inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@visit.Id" />
+                                <button type="submit">Check In</button>
+                            </form>
+                        }
+                        else if (visit.Status == RequestStatus.CheckedIn)
+                        {
+                            <form method="post" asp-action="CheckOut" style="display:inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@visit.Id" />
+                                <button type="submit">Check Out</button>
+                            </form>
+                        }
+                    </td>
+                </table>
+            }
+        </tbody>
+    </table>
+}
