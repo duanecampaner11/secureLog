@@ -49,6 +49,10 @@ public class VisitRequest
     
     public string? ApprovedByUserId { get; set; }
     
+    // These are the missing properties that AdminController needs
+    public string? ReviewedByUserId { get; set; }
+    public DateTime? ReviewedAt { get; set; }
+    
     public DateTime RequestedAt { get; set; } = DateTime.UtcNow;
     public DateTime? ApprovedAt { get; set; }
     public DateTime? CheckInTime { get; set; }
