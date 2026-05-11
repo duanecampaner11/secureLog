@@ -1,4 +1,4 @@
-@model List<VisitRequest>
+﻿@model List<VisitRequest>
 
 @{
     ViewData["Title"] = "My Dashboard";
@@ -28,7 +28,7 @@ else
             @foreach (var request in Model)
             {
                 <tr>
-                    <td>@request.VisitDate.ToString("yyyy-MM-dd")</td>
+                    <td>@(request.VisitDate.HasValue ? request.VisitDate.Value.ToString("yyyy-MM-dd") : "Not set")</td>
                     <td>@request.Purpose</td>
                     <td>@request.PersonToMeet</td>
                     <td>@request.Status</td>

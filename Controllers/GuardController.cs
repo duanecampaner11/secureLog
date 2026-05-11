@@ -17,24 +17,15 @@ public class GuardController : Controller
         _db = db;
     }
 
-    [HttpGet]
     public async Task<IActionResult> Dashboard()
     {
         var today = DateTime.Today;
-        var confirmedVisits = await _db.VisitRequests
-            .Include(r => r.ClientUser)
-            .Where(r => (r.Status == RequestStatus.Confirmed || r.Status == RequestStatus.CheckedIn) 
-                        && r.VisitDate.Date == today)
-            .OrderBy(r => r.VisitTime)
+        var visits = await _db.VisitRequests
+            .Where(v => v.VisitDate.HasValue && v.VisitDate.Value.Date == today && 
+                       (v.Status == RequestStatus.Confirmed || v.Status == RequestStatus.CheckedIn))
+            .OrderBy(v => v.VisitTime)
             .ToListAsync();
-            
-        return View(confirmedVisits);
-    }
-
-    [HttpGet]
-    public IActionResult VerifyVisitor()
-    {
-        return View();
+        return View(visits);
     }
 
     [HttpPost]
@@ -43,66 +34,46 @@ public class GuardController : Controller
     {
         if (string.IsNullOrWhiteSpace(confirmationId))
         {
-            ViewBag.Error = "Please enter a confirmation ID.";
-            return View();
+            TempData["Error"] = "Please enter a confirmation ID";
+            return RedirectToAction(nameof(Dashboard));
         }
 
         var visit = await _db.VisitRequests
-            .Include(r => r.ClientUser)
-            .FirstOrDefaultAsync(r => r.ConfirmationId == confirmationId.ToUpper());
+            .FirstOrDefaultAsync(v => v.ConfirmationId == confirmationId.ToUpper());
 
         if (visit == null)
         {
-            ViewBag.Error = "Invalid confirmation ID.";
-            ViewBag.IsValid = false;
-            return View();
+            TempData["Error"] = "Invalid confirmation ID";
+            return RedirectToAction(nameof(Dashboard));
         }
 
-        if (visit.Status != RequestStatus.Confirmed && visit.Status != RequestStatus.CheckedIn)
+        if (visit.Status != RequestStatus.Confirmed)
         {
-            ViewBag.Error = $"This request is {visit.Status}. Access denied.";
-            ViewBag.IsValid = false;
-            ViewBag.Visit = visit;
-            return View();
+            TempData["Error"] = $"This request is {visit.Status}. Access denied.";
+            return RedirectToAction(nameof(Dashboard));
         }
 
-        if (visit.VisitDate.Date != DateTime.Today)
+        if (visit.VisitDate.HasValue && visit.VisitDate.Value.Date != DateTime.Today)
         {
-            ViewBag.Error = $"This confirmation is valid only for {visit.VisitDate:yyyy-MM-dd}. Access denied.";
-            ViewBag.IsValid = false;
-            ViewBag.Visit = visit;
-            return View();
+            TempData["Error"] = $"Valid only for {visit.VisitDate.Value:yyyy-MM-dd}";
+            return RedirectToAction(nameof(Dashboard));
         }
 
-        ViewBag.IsValid = true;
-        ViewBag.Visit = visit;
-        return View();
+        TempData["Success"] = $"Valid visitor: {visit.FullName} - {visit.Purpose}";
+        return RedirectToAction(nameof(Dashboard));
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CheckIn(int id)
     {
-        var request = await _db.VisitRequests.FindAsync(id);
-        if (request != null && request.Status == RequestStatus.Confirmed)
+        var visit = await _db.VisitRequests.FindAsync(id);
+        if (visit != null && visit.Status == RequestStatus.Confirmed)
         {
-            request.Status = RequestStatus.CheckedIn;
-            request.CheckInTime = DateTime.UtcNow;
+            visit.Status = RequestStatus.CheckedIn;
+            visit.CheckInTime = DateTime.UtcNow;
             await _db.SaveChangesAsync();
-            
-            // Also add to legacy GuestEntries
-            var entry = new GuestEntry
-            {
-                Name = request.FullName,
-                Purpose = request.Purpose,
-                TimeIn = DateTime.UtcNow,
-                LoggedByUserId = "Guard",
-                LoggedAt = DateTime.UtcNow
-            };
-            _db.GuestEntries.Add(entry);
-            await _db.SaveChangesAsync();
-            
-            TempData["Success"] = $"{request.FullName} checked in successfully.";
+            TempData["Success"] = $"{visit.FullName} checked in.";
         }
         return RedirectToAction(nameof(Dashboard));
     }
@@ -111,13 +82,13 @@ public class GuardController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CheckOut(int id)
     {
-        var request = await _db.VisitRequests.FindAsync(id);
-        if (request != null && request.Status == RequestStatus.CheckedIn)
+        var visit = await _db.VisitRequests.FindAsync(id);
+        if (visit != null && visit.Status == RequestStatus.CheckedIn)
         {
-            request.Status = RequestStatus.Completed;
-            request.CheckOutTime = DateTime.UtcNow;
+            visit.Status = RequestStatus.Completed;
+            visit.CheckOutTime = DateTime.UtcNow;
             await _db.SaveChangesAsync();
-            TempData["Success"] = $"{request.FullName} checked out.";
+            TempData["Success"] = $"{visit.FullName} checked out.";
         }
         return RedirectToAction(nameof(Dashboard));
     }

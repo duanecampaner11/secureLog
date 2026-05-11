@@ -116,7 +116,7 @@
                         <tr>
                             <td>@request.ClientUser?.Email</td>
                             <td>@request.FullName</td>
-                            <td>@request.VisitDate.ToString("yyyy-MM-dd")</td>
+                            <td>@(request.VisitDate.HasValue ? request.VisitDate.Value.ToString("yyyy-MM-dd") : "Not set")</td>
                             <td>@request.Purpose</td>
                             <td>@request.PersonToMeet</td>
                             <td>
