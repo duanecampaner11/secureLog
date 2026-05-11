@@ -53,66 +53,132 @@ public class GuestController : Controller
         return View(vm);
     }
 
-    [HttpPost, ValidateAntiForgeryToken]
-public async Task<IActionResult> Add(DashboardViewModel vm)
-{
-    // DEBUG: Check if NewGuest is null
-    if (vm.NewGuest == null)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Add(DashboardViewModel vm)
     {
-        TempData["Error"] = "Debug: NewGuest is null";
-        return RedirectToAction(nameof(Index));
+        // Detailed Debugging
+        Console.WriteLine("=== Add Method Called ===");
+        Console.WriteLine($"ModelState.IsValid: {ModelState.IsValid}");
+        Console.WriteLine($"vm is null: {vm is null}");
+        Console.WriteLine($"vm.NewGuest is null: {vm?.NewGuest is null}");
+        
+        if (vm?.NewGuest != null)
+        {
+            Console.WriteLine($"Name from form: '{vm.NewGuest.Name}'");
+            Console.WriteLine($"Purpose from form: '{vm.NewGuest.Purpose}'");
+        }
+
+        // If ModelState is invalid, show the specific errors
+        if (!ModelState.IsValid)
+        {
+            var errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage);
+            var errorMessage = string.Join("; ", errors);
+            TempData["Error"] = $"Validation failed: {errorMessage}";
+            Console.WriteLine($"ModelState Errors: {errorMessage}");
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Check if NewGuest itself is null (a common problem)
+        if (vm?.NewGuest == null)
+        {
+            TempData["Error"] = "Form data error: NewGuest is null. Please check the form structure.";
+            Console.WriteLine("Error: vm.NewGuest is null.");
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Check if required fields are empty
+        if (string.IsNullOrWhiteSpace(vm.NewGuest.Name))
+        {
+            TempData["Error"] = "Name is required.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        if (string.IsNullOrWhiteSpace(vm.NewGuest.Purpose))
+        {
+            TempData["Error"] = "Purpose is required.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        var userId = _userManager.GetUserId(User);
+        if (string.IsNullOrEmpty(userId))
+        {
+            TempData["Error"] = "You must be logged in to add a guest.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        try
+        {
+            var entry = new GuestEntry
+            {
+                Name = vm.NewGuest.Name.Trim(),
+                Purpose = vm.NewGuest.Purpose.Trim(),
+                TimeIn = DateTime.UtcNow,
+                LoggedByUserId = userId,
+                LoggedAt = DateTime.UtcNow
+            };
+
+            _db.GuestEntries.Add(entry);
+            await _db.SaveChangesAsync();
+
+            TempData["Success"] = "Guest added successfully!";
+            return RedirectToAction(nameof(Index));
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"Database error: {ex.Message}";
+            Console.WriteLine($"Database error: {ex.Message}");
+            return RedirectToAction(nameof(Index));
+        }
     }
-    
-    // DEBUG: Check ModelState errors
-    if (!ModelState.IsValid)
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> TimeOut(int id)
     {
-        var errors = string.Join("; ", ModelState.Values
-            .SelectMany(x => x.Errors)
-            .Select(x => x.ErrorMessage));
-        TempData["Error"] = $"Validation failed: {errors}";
-        return RedirectToAction(nameof(Index));
-    }
-    
-    // DEBUG: Check if fields are empty
-    if (string.IsNullOrWhiteSpace(vm.NewGuest.Name))
-    {
-        TempData["Error"] = "Debug: Name is empty";
-        return RedirectToAction(nameof(Index));
-    }
-    
-    if (string.IsNullOrWhiteSpace(vm.NewGuest.Purpose))
-    {
-        TempData["Error"] = "Debug: Purpose is empty";
+        try
+        {
+            var entry = await _db.GuestEntries.FindAsync(id);
+            if (entry != null && entry.TimeOut == null)
+            {
+                entry.TimeOut = DateTime.UtcNow;
+                await _db.SaveChangesAsync();
+                TempData["Success"] = "Guest checked out successfully!";
+            }
+            else
+            {
+                TempData["Error"] = "Guest already checked out or not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"Error: {ex.Message}";
+        }
         return RedirectToAction(nameof(Index));
     }
 
-    var userId = _userManager.GetUserId(User);
-    
-    // DEBUG: Check if user is logged in
-    if (string.IsNullOrEmpty(userId))
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id)
     {
-        TempData["Error"] = "Debug: User not logged in";
-        return RedirectToAction(nameof(Index));
-    }
-    
-    try
-    {
-        var entry = new GuestEntry
+        try
         {
-            Name = vm.NewGuest.Name.Trim(),
-            Purpose = vm.NewGuest.Purpose.Trim(),
-            TimeIn = DateTime.UtcNow,
-            LoggedByUserId = userId,
-            LoggedAt = DateTime.UtcNow
-        };
-        _db.GuestEntries.Add(entry);
-        await _db.SaveChangesAsync();
-        TempData["Success"] = "Guest added successfully!";
+            var entry = await _db.GuestEntries.FindAsync(id);
+            if (entry != null)
+            {
+                _db.GuestEntries.Remove(entry);
+                await _db.SaveChangesAsync();
+                TempData["Success"] = "Guest entry deleted successfully!";
+            }
+            else
+            {
+                TempData["Error"] = "Guest entry not found.";
+            }
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = $"Error: {ex.Message}";
+        }
         return RedirectToAction(nameof(Index));
     }
-    catch (Exception ex)
-    {
-        TempData["Error"] = $"Database error: {ex.Message}";
-        return RedirectToAction(nameof(Index));
-    }
-}}
+}
