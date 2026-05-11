@@ -1,4 +1,4 @@
-@model VisitRequest
+﻿@model VisitRequest
 
 @{
     ViewData["Title"] = "Create Visit Request";
@@ -6,45 +6,49 @@
 
 <h2>Create Visit Request</h2>
 
-<form asp-action="CreateRequest" method="post">
+<form method="post" asp-action="CreateRequest">
     @Html.AntiForgeryToken()
     
     <div class="mb-3">
-        <label asp-for="FullName" class="form-label">Full Name</label>
-        <input asp-for="FullName" class="form-control" required />
+        <label class="form-label">Full Name</label>
+        <input type="text" name="FullName" class="form-control" required />
     </div>
     
     <div class="mb-3">
-        <label asp-for="Company" class="form-label">Company</label>
-        <input asp-for="Company" class="form-control" />
+        <label class="form-label">Company</label>
+        <input type="text" name="Company" class="form-control" />
     </div>
     
     <div class="mb-3">
-        <label asp-for="Purpose" class="form-label">Purpose</label>
-        <textarea asp-for="Purpose" class="form-control" rows="3" required></textarea>
+        <label class="form-label">Purpose of Visit</label>
+        <textarea name="Purpose" class="form-control" rows="3" required></textarea>
     </div>
     
     <div class="mb-3">
-        <label asp-for="PersonToMeet" class="form-label">Person to Meet</label>
-        <input asp-for="PersonToMeet" class="form-control" required />
+        <label class="form-label">Person to Meet</label>
+        <input type="text" name="PersonToMeet" class="form-control" required />
     </div>
     
     <div class="row">
         <div class="col-md-6">
-            <label asp-for="VisitDate" class="form-label">Visit Date</label>
-            <input asp-for="VisitDate" type="date" class="form-control" required />
+            <div class="mb-3">
+                <label class="form-label">Visit Date</label>
+                <input type="date" name="VisitDate" class="form-control" required />
+            </div>
         </div>
         <div class="col-md-6">
-            <label asp-for="VisitTime" class="form-label">Visit Time</label>
-            <input asp-for="VisitTime" type="time" class="form-control" required />
+            <div class="mb-3">
+                <label class="form-label">Visit Time</label>
+                <input type="time" name="VisitTime" class="form-control" required />
+            </div>
         </div>
     </div>
     
     <div class="mb-3">
-        <label asp-for="Notes" class="form-label">Notes</label>
-        <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+        <label class="form-label">Additional Notes</label>
+        <textarea name="Notes" class="form-control" rows="2"></textarea>
     </div>
     
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <button type="submit" class="btn btn-primary">Submit Request</button>
     <a href="/Client/Dashboard" class="btn btn-secondary">Cancel</a>
 </form>

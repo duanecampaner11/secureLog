@@ -78,20 +78,47 @@ public class ClientController : Controller
         return RedirectToAction(nameof(Dashboard));
     }
 
-    [HttpGet]
-    public async Task<IActionResult> MyRequests()
+   [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> CreateRequest(VisitRequest model)
+{
+    if (!ModelState.IsValid)
     {
-        var user = await _userManager.GetUserAsync(User);
-        if (user == null)
+        TempData["Error"] = "Please fill in all required fields.";
+        return View(model);
+    }
+    
+    var user = await _userManager.GetUserAsync(User);
+    if (user == null)
+    {
+        return RedirectToAction("Login", "Account");
+    }
+    
+    try
+    {
+        var request = new VisitRequest
         {
-            return RedirectToAction("Login", "Account");
-        }
+            ClientUserId = user.Id,
+            FullName = model.FullName,
+            Company = model.Company,
+            Purpose = model.Purpose,
+            PersonToMeet = model.PersonToMeet,
+            VisitDate = model.VisitDate,
+            VisitTime = model.VisitTime,
+            Notes = model.Notes,
+            Status = RequestStatus.Pending,
+            RequestedAt = DateTime.UtcNow
+        };
         
-        var requests = await _db.VisitRequests
-            .Where(r => r.ClientUserId == user.Id)
-            .OrderByDescending(r => r.RequestedAt)
-            .ToListAsync();
-            
-        return View(requests);
+        _db.VisitRequests.Add(request);
+        await _db.SaveChangesAsync();
+        
+        TempData["Success"] = "Your visit request has been submitted successfully!";
+        return RedirectToAction(nameof(Dashboard));
+    }
+    catch (Exception ex)
+    {
+        TempData["Error"] = $"Error: {ex.Message}";
+        return View(model);
     }
 }
