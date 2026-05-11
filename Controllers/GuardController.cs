@@ -27,7 +27,7 @@ public class GuardController : Controller
             .OrderBy(v => v.VisitDate)
             .Take(50)
             .ToListAsync();
-       return View("Index");
+       return View();
     }
 
     [HttpPost]

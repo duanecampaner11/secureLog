@@ -1,5 +1,4 @@
-@model List<VisitRequest>
-
+﻿@model List<VisitRequest>
 @{
     ViewData["Title"] = "Guard Dashboard";
 }
@@ -8,22 +7,20 @@
 
 @if (TempData["Error"] != null)
 {
-    <div class="alert alert-danger">@TempData["Error"]</div>
+    <p style="color:red">Error: @TempData["Error"]</p>
 }
 @if (TempData["Success"] != null)
 {
-    <div class="alert alert-success">@TempData["Success"]</div>
+    <p style="color:green">Success: @TempData["Success"]</p>
 }
 
-<div>
-    <h3>Verify Visitor</h3>
-    <form method="post" asp-action="VerifyVisitor">
-        @Html.AntiForgeryToken()
-        <label>Confirmation ID:</label>
-        <input type="text" name="confirmationId" required />
-        <button type="submit">Verify</button>
-    </form>
-</div>
+<h3>Verify Visitor</h3>
+<form method="post" asp-action="VerifyVisitor">
+    @Html.AntiForgeryToken()
+    <label>Confirmation ID:</label>
+    <input type="text" name="confirmationId" required />
+    <button type="submit">Verify</button>
+</form>
 
 <hr />
 
@@ -35,48 +32,28 @@
 }
 else
 {
-    <table border="1">
-        <thead>
-            <tr>
-                <th>Confirmation ID</th>
-                <th>Full Name</th>
-                <th>Company</th>
-                <th>Purpose</th>
-                <th>Visit Date</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var visit in Model)
+    <ul>
+    @foreach (var visit in Model)
+    {
+        <li>
+            <b>@visit.ConfirmationId</b> - @visit.FullName - @visit.Company - @visit.Purpose - @visit.VisitDate.ToString("yyyy-MM-dd")
+            @if (visit.Status == RequestStatus.Confirmed)
             {
-                <tr>
-                    <td>@visit.ConfirmationId</strong></td>
-                    <td>@visit.FullName</strong></td>
-                    <td>@visit.Company</strong></td>
-                    <td>@visit.Purpose</strong></td>
-                    <td>@visit.VisitDate.ToString("yyyy-MM-dd")</strong></td>
-                    <td>@visit.Status</strong></td>
-                    <td>
-                        @if (visit.Status == RequestStatus.Confirmed)
-                        {
-                            <form method="post" asp-action="CheckIn" style="display:inline">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@visit.Id" />
-                                <button type="submit">Check In</button>
-                            </form>
-                        }
-                        else if (visit.Status == RequestStatus.CheckedIn)
-                        {
-                            <form method="post" asp-action="CheckOut" style="display:inline">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@visit.Id" />
-                                <button type="submit">Check Out</button>
-                            </form>
-                        }
-                    </td>
-                </table>
+                <form method="post" asp-action="CheckIn" style="display:inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@visit.Id" />
+                    <button type="submit">Check In</button>
+                </form>
             }
-        </tbody>
-    </table>
+            else if (visit.Status == RequestStatus.CheckedIn)
+            {
+                <form method="post" asp-action="CheckOut" style="display:inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@visit.Id" />
+                    <button type="submit">Check Out</button>
+                </form>
+            }
+        </li>
+    }
+    </ul>
 }
