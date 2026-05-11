@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace SecureLog.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class AddMissingColumns : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -187,18 +187,22 @@ namespace SecureLog.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ClientUserId = table.Column<string>(type: "text", nullable: false),
                     FullName = table.Column<string>(type: "text", nullable: false),
-                    Purpose = table.Column<string>(type: "text", nullable: false),
-                    VisitDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Company = table.Column<string>(type: "text", nullable: true),
-                    PersonToVisit = table.Column<string>(type: "text", nullable: true),
+                    Purpose = table.Column<string>(type: "text", nullable: false),
+                    PersonToMeet = table.Column<string>(type: "text", nullable: false),
+                    VisitDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    VisitTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Notes = table.Column<string>(type: "text", nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: false),
-                    QueueNumber = table.Column<string>(type: "text", nullable: true),
+                    ConfirmationId = table.Column<string>(type: "text", nullable: true),
                     ApprovedByUserId = table.Column<string>(type: "text", nullable: true),
+                    ReviewedByUserId = table.Column<string>(type: "text", nullable: true),
+                    ReviewedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     RequestedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ApprovedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CheckInTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     CheckOutTime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    RejectionReason = table.Column<string>(type: "text", nullable: true)
+                    ReturnReason = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -267,6 +271,11 @@ namespace SecureLog.Migrations
                 name: "IX_VisitRequests_ClientUserId",
                 table: "VisitRequests",
                 column: "ClientUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_VisitRequests_ConfirmationId",
+                table: "VisitRequests",
+                column: "ConfirmationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VisitRequests_Status",
