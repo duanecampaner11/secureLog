@@ -95,3 +95,4 @@ using (var scope = app.Services.CreateScope())
         await userManager.AddToRoleAsync(guard, "Guard");
     }
 }
+// Force rebuild - 2026-05-11 16:11:31
