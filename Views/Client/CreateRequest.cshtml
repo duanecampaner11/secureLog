@@ -6,39 +6,44 @@
 
 <h2>Create Visit Request</h2>
 
-<form method="post" asp-action="CreateRequest">
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<form method="post">
     @Html.AntiForgeryToken()
     
     <div class="mb-3">
-        <label class="form-label">Full Name</label>
-        <input type="text" name="FullName" class="form-control" required />
+        <label class="form-label">Full Name *</label>
+        <input type="text" name="FullName" class="form-control" value="@Model?.FullName" required />
     </div>
     
     <div class="mb-3">
         <label class="form-label">Company</label>
-        <input type="text" name="Company" class="form-control" />
+        <input type="text" name="Company" class="form-control" value="@Model?.Company" />
     </div>
     
     <div class="mb-3">
-        <label class="form-label">Purpose of Visit</label>
-        <textarea name="Purpose" class="form-control" rows="3" required></textarea>
+        <label class="form-label">Purpose of Visit *</label>
+        <textarea name="Purpose" class="form-control" rows="3" required>@Model?.Purpose</textarea>
     </div>
     
     <div class="mb-3">
-        <label class="form-label">Person to Meet</label>
-        <input type="text" name="PersonToMeet" class="form-control" required />
+        <label class="form-label">Person to Meet *</label>
+        <input type="text" name="PersonToMeet" class="form-control" value="@Model?.PersonToMeet" required />
     </div>
     
     <div class="row">
         <div class="col-md-6">
             <div class="mb-3">
-                <label class="form-label">Visit Date</label>
+                <label class="form-label">Visit Date *</label>
                 <input type="date" name="VisitDate" class="form-control" required />
             </div>
         </div>
         <div class="col-md-6">
             <div class="mb-3">
-                <label class="form-label">Visit Time</label>
+                <label class="form-label">Visit Time *</label>
                 <input type="time" name="VisitTime" class="form-control" required />
             </div>
         </div>
@@ -46,7 +51,7 @@
     
     <div class="mb-3">
         <label class="form-label">Additional Notes</label>
-        <textarea name="Notes" class="form-control" rows="2"></textarea>
+        <textarea name="Notes" class="form-control" rows="2">@Model?.Notes</textarea>
     </div>
     
     <button type="submit" class="btn btn-primary">Submit Request</button>

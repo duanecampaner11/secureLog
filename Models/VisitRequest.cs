@@ -14,28 +14,29 @@ public class VisitRequest
     [ForeignKey("ClientUserId")]
     public virtual ApplicationUser? ClientUser { get; set; }
     
-    [Required]
+    [Required(ErrorMessage = "Full Name is required")]
     [Display(Name = "Full Name")]
     public string FullName { get; set; } = string.Empty;
     
-    [Required]
-    [Display(Name = "Company/Organization")]
+    [Display(Name = "Company")]
     public string? Company { get; set; }
     
-    [Required]
+    [Required(ErrorMessage = "Purpose of visit is required")]
     [Display(Name = "Purpose of Visit")]
     public string Purpose { get; set; } = string.Empty;
     
-    [Required]
-    [Display(Name = "Person/Department to Meet")]
+    [Required(ErrorMessage = "Person to meet is required")]
+    [Display(Name = "Person to Meet")]
     public string PersonToMeet { get; set; } = string.Empty;
     
-    [Required]
+    [Required(ErrorMessage = "Visit date is required")]
     [Display(Name = "Visit Date")]
+    [DataType(DataType.Date)]
     public DateTime VisitDate { get; set; }
     
-    [Required]
+    [Required(ErrorMessage = "Visit time is required")]
     [Display(Name = "Visit Time")]
+    [DataType(DataType.Time)]
     public DateTime VisitTime { get; set; }
     
     [Display(Name = "Additional Notes")]
@@ -46,11 +47,10 @@ public class VisitRequest
     [Display(Name = "Confirmation ID")]
     public string? ConfirmationId { get; set; }
     
-    [Display(Name = "Approved/Denied By")]
-    public string? ReviewedByUserId { get; set; }
+    public string? ApprovedByUserId { get; set; }
     
     public DateTime RequestedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? ReviewedAt { get; set; }
+    public DateTime? ApprovedAt { get; set; }
     public DateTime? CheckInTime { get; set; }
     public DateTime? CheckOutTime { get; set; }
     
@@ -60,9 +60,9 @@ public class VisitRequest
 
 public enum RequestStatus
 {
-    Pending,    // Waiting for admin approval
-    Confirmed,  // Admin approved - confirmation ID generated
-    Returned,   // Admin denied - sent back to client
-    CheckedIn,  // Guard verified at front desk
-    Completed   // Visitor checked out
+    Pending,
+    Confirmed,
+    Returned,
+    CheckedIn,
+    Completed
 }
