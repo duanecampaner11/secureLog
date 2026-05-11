@@ -62,6 +62,6 @@ public class DashboardViewModel
 
 public class UserRoleViewModel
 {
-    public ApplicationUser User { get; set; }
+    public ApplicationUser? User { get; set; }  // Made nullable with '?'
     public List<string> Roles { get; set; } = new List<string>();
 }
