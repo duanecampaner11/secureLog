@@ -12,25 +12,42 @@ public class AdminController : Controller
 {
     private readonly ApplicationDbContext _db;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly RoleManager<IdentityRole> _roleManager;
 
-    public AdminController(ApplicationDbContext db, UserManager<ApplicationUser> userManager)
+    public AdminController(ApplicationDbContext db, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
     {
         _db = db;
         _userManager = userManager;
+        _roleManager = roleManager;
     }
 
     [HttpGet]
     public async Task<IActionResult> Dashboard()
     {
+        // Get pending visit requests
         var pendingRequests = await _db.VisitRequests
             .Include(r => r.ClientUser)
             .Where(r => r.Status == RequestStatus.Pending)
             .OrderBy(r => r.RequestedAt)
             .ToListAsync();
-            
-        var allUsers = await _userManager.Users.ToListAsync();
         
-        ViewBag.AllUsers = allUsers;
+        // Get all users with their roles
+        var allUsers = await _userManager.Users.ToListAsync();
+        var usersWithRoles = new List<UserRoleViewModel>();
+        
+        foreach (var user in allUsers)
+        {
+            var roles = await _userManager.GetRolesAsync(user);
+            usersWithRoles.Add(new UserRoleViewModel
+            {
+                User = user,
+                Roles = roles.ToList()
+            });
+        }
+        
+        ViewBag.UsersWithRoles = usersWithRoles;
+        ViewBag.AllRoles = await _roleManager.Roles.ToListAsync();
+        
         return View(pendingRequests);
     }
 
@@ -48,7 +65,7 @@ public class AdminController : Controller
         var admin = await _userManager.GetUserAsync(User);
         
         // Generate unique confirmation ID
-        var confirmationId = GenerateConfirmationId(request);
+        var confirmationId = $"CONF-{DateTime.Now:yyyyMMdd}-{new Random().Next(1000, 9999)}";
         
         request.Status = RequestStatus.Confirmed;
         request.ConfirmationId = confirmationId;
@@ -87,21 +104,53 @@ public class AdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteUser(string userId)
+    public async Task<IActionResult> ChangeUserRole(string userId, string newRole)
     {
         var user = await _userManager.FindByIdAsync(userId);
-        if (user != null)
+        if (user == null)
         {
-            await _userManager.DeleteAsync(user);
-            TempData["Success"] = $"User {user.Email} has been deleted.";
+            TempData["Error"] = "User not found.";
+            return RedirectToAction(nameof(Dashboard));
         }
+
+        // Remove all current roles
+        var currentRoles = await _userManager.GetRolesAsync(user);
+        await _userManager.RemoveFromRolesAsync(user, currentRoles);
+        
+        // Add new role
+        await _userManager.AddToRoleAsync(user, newRole);
+        
+        TempData["Success"] = $"{user.UserName}'s role has been changed to {newRole}.";
         return RedirectToAction(nameof(Dashboard));
     }
 
-    private string GenerateConfirmationId(VisitRequest request)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteUser(string userId)
     {
-        var datePart = request.VisitDate.ToString("yyyyMMdd");
-        var randomPart = new Random().Next(1000, 9999).ToString();
-        return $"CONF-{datePart}-{randomPart}";
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            TempData["Error"] = "User not found.";
+            return RedirectToAction(nameof(Dashboard));
+        }
+
+        // Don't allow admin to delete themselves
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (user.Id == currentUser.Id)
+        {
+            TempData["Error"] = "You cannot delete your own account.";
+            return RedirectToAction(nameof(Dashboard));
+        }
+
+        await _userManager.DeleteAsync(user);
+        TempData["Success"] = $"User {user.UserName} has been deleted.";
+        return RedirectToAction(nameof(Dashboard));
     }
+}
+
+public class UserRoleViewModel
+{
+    public ApplicationUser User { get; set; }
+    public List<string> Roles { get; set; } = new List<string>();
 }
