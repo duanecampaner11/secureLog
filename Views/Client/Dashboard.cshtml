@@ -6,6 +6,15 @@
 
 <h2>My Visit Requests</h2>
 
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
 <a href="/Client/CreateRequest" class="btn btn-primary mb-3">+ New Request</a>
 
 @if (!Model.Any())
@@ -28,11 +37,11 @@ else
             @foreach (var request in Model)
             {
                 <tr>
-                    <td>@(request.VisitDate.HasValue ? request.VisitDate.Value.ToString("yyyy-MM-dd") : "Not set")</td>
-                    <td>@request.Purpose</td>
-                    <td>@request.PersonToMeet</td>
-                    <td>@request.Status</td>
-                    <td>@request.ConfirmationId</td>
+                    <td>@(request.VisitDate.HasValue ? request.VisitDate.Value.ToString("yyyy-MM-dd") : "Not set")</strong></td>
+                    <td>@request.Purpose</strong></td>
+                    <td>@request.PersonToMeet</strong></td>
+                    <td><span class="badge bg-warning">@request.Status</span></td>
+                    <td>@request.ConfirmationId</strong></td>
                 </tr>
             }
         </tbody>

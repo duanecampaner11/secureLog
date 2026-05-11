@@ -67,16 +67,7 @@
                                     <td>@v.Company</strong></td>
                                     <td>@v.Purpose</strong></td>
                                     <td>@(v.VisitTime.HasValue ? v.VisitTime.Value.ToString("hh:mm tt") : "Not set")</strong></td>
-                                    <td>
-                                        @if (v.Status == RequestStatus.Confirmed)
-                                        {
-                                            <span class="badge bg-success">Waiting</span>
-                                        }
-                                        else if (v.Status == RequestStatus.CheckedIn)
-                                        {
-                                            <span class="badge bg-info">Checked In</span>
-                                        }
-                                    </td>
+                                    <td><span class="badge bg-success">@v.Status</span></td>
                                     <td>
                                         @if (v.Status == RequestStatus.Confirmed)
                                         {
