@@ -7,8 +7,61 @@
 
 <h2>Admin Dashboard</h2>
 
-<!-- User Management Section -->
+<!-- Pending Visit Requests Section -->
 <div class="card mb-4">
+    <div class="card-header bg-warning">
+        <h4>Pending Visit Requests</h4>
+    </div>
+    <div class="card-body">
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info">No pending requests.</div>
+        }
+        else
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Visitor Name</th>
+                        <th>Visit Date</th>
+                        <th>Purpose</th>
+                        <th>Person to Meet</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var request in Model)
+                    {
+                        <tr>
+                            <td>@request.ClientUser?.Email</td>
+                            <td>@request.FullName</td>
+                            <td>@request.VisitDate.ToString("yyyy-MM-dd")</td>
+                            <td>@request.Purpose</td>
+                            <td>@request.PersonToMeet</td>
+                            <td>
+                                <form method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@request.Id" />
+                                    <button type="submit" formaction="/Admin/ConfirmRequest" class="btn btn-sm btn-success">Confirm</button>
+                                </form>
+                                <form method="post" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@request.Id" />
+                                    <input type="hidden" name="returnReason" value="No reason provided" />
+                                    <button type="submit" formaction="/Admin/ReturnRequest" class="btn btn-sm btn-danger">Return</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+<!-- User Management Section -->
+<div class="card">
     <div class="card-header bg-primary text-white">
         <h4>User Management</h4>
     </div>
@@ -19,13 +72,12 @@
         }
         else
         {
-            <table class="table table-striped table-bordered">
-                <thead class="table-dark">
+            <table class="table table-striped">
+                <thead>
                     <tr>
                         <th>Username</th>
                         <th>Email</th>
                         <th>Full Name</th>
-                        <th>Company</th>
                         <th>Current Role</th>
                         <th>Change Role</th>
                         <th>Actions</th>
@@ -38,7 +90,6 @@
                             <td>@userRole.User?.UserName</td>
                             <td>@userRole.User?.Email</td>
                             <td>@userRole.User?.FullName</td>
-                            <td>@userRole.User?.CompanyName</td>
                             <td>
                                 @if (userRole.Roles.Contains("Admin"))
                                 {
@@ -78,59 +129,6 @@
                                 {
                                     <span>Protected</span>
                                 }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        }
-    </div>
-</div>
-
-<!-- Pending Visit Requests Section -->
-<div class="card">
-    <div class="card-header bg-warning">
-        <h4>Pending Visit Requests</h4>
-    </div>
-    <div class="card-body">
-        @if (!Model.Any())
-        {
-            <p>No pending requests.</p>
-        }
-        else
-        {
-            <table class="table table-striped">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Client</th>
-                        <th>Visitor Name</th>
-                        <th>Visit Date</th>
-                        <th>Purpose</th>
-                        <th>Person to Meet</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var request in Model)
-                    {
-                        <tr>
-                            <td>@request.ClientUser?.Email</td>
-                            <td>@request.FullName</td>
-                            <td>@(request.VisitDate.HasValue ? request.VisitDate.Value.ToString("yyyy-MM-dd") : "Not set")</td>
-                            <td>@request.Purpose</td>
-                            <td>@request.PersonToMeet</td>
-                            <td>
-                                <form method="post" style="display:inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@request.Id" />
-                                    <button type="submit" formaction="/Admin/ConfirmRequest" class="btn btn-sm btn-success">Confirm</button>
-                                </form>
-                                <form method="post" style="display:inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@request.Id" />
-                                    <input type="hidden" name="returnReason" value="No reason provided" />
-                                    <button type="submit" formaction="/Admin/ReturnRequest" class="btn btn-sm btn-danger">Return</button>
-                                </form>
                             </td>
                         </tr>
                     }

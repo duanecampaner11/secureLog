@@ -21,9 +21,9 @@ public class GuardController : Controller
     {
         var today = DateTime.Today;
         var visits = await _db.VisitRequests
-            .Where(v => v.VisitDate.HasValue && v.VisitDate.Value.Date == today && 
+            .Where(v => v.VisitDate.Date == today && 
                        (v.Status == RequestStatus.Confirmed || v.Status == RequestStatus.CheckedIn))
-            .OrderBy(v => v.VisitTime)
+            .OrderBy(v => v.VisitDate)
             .ToListAsync();
         return View(visits);
     }
@@ -53,9 +53,9 @@ public class GuardController : Controller
             return RedirectToAction(nameof(Dashboard));
         }
 
-        if (visit.VisitDate.HasValue && visit.VisitDate.Value.Date != DateTime.Today)
+        if (visit.VisitDate.Date != DateTime.Today)
         {
-            TempData["Error"] = $"Valid only for {visit.VisitDate.Value:yyyy-MM-dd}";
+            TempData["Error"] = $"Valid only for {visit.VisitDate:yyyy-MM-dd}";
             return RedirectToAction(nameof(Dashboard));
         }
 
