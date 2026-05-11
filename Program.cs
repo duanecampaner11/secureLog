@@ -5,13 +5,16 @@ using SecureLog.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ===== CRITICAL FOR RENDER: Bind to the correct port =====
 var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
 
+// Add services to the container
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+// Add Identity services
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
@@ -35,6 +38,7 @@ builder.Services.AddRazorPages();
 
 var app = builder.Build();
 
+// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -53,11 +57,13 @@ app.MapControllerRoute(
     pattern: "{controller=Guest}/{action=Index}/{id?}");
 app.MapRazorPages();
 
+// Seed Roles and default users
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
     
+    // Create roles
     string[] roles = { "Admin", "Guard", "Client" };
     foreach (var role in roles)
     {
@@ -65,6 +71,7 @@ using (var scope = app.Services.CreateScope())
             await roleManager.CreateAsync(new IdentityRole(role));
     }
     
+    // Create default Admin
     var adminEmail = "admin@securelog.com";
     if (await userManager.FindByEmailAsync(adminEmail) == null)
     {
@@ -80,6 +87,7 @@ using (var scope = app.Services.CreateScope())
         await userManager.AddToRoleAsync(admin, "Admin");
     }
     
+    // Create default Guard
     var guardEmail = "guard@securelog.com";
     if (await userManager.FindByEmailAsync(guardEmail) == null)
     {
