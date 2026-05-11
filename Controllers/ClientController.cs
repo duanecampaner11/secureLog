@@ -78,6 +78,7 @@ public class ClientController : Controller
                 Purpose = string.IsNullOrWhiteSpace(model.Purpose) ? "Not specified" : model.Purpose,
                 PersonToMeet = string.IsNullOrWhiteSpace(model.PersonToMeet) ? "Not specified" : model.PersonToMeet,
                 VisitDate = visitDate,
+                VisitTime = DateTime.UtcNow,  // Added: Provide current UTC time for database constraint
                 Notes = model.Notes,
                 Status = RequestStatus.Pending,
                 RequestedAt = DateTime.UtcNow
