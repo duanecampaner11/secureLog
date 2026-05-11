@@ -24,11 +24,11 @@
             <div class="card-body">
                 <form method="post" asp-action="VerifyVisitor">
                     @Html.AntiForgeryToken()
-                    <div class="mb-3">
-                        <label class="form-label">Confirmation ID</label>
+                    <div class="form-group">
+                        <label>Confirmation ID</label>
                         <input type="text" name="confirmationId" class="form-control" required />
                     </div>
-                    <button type="submit" class="btn btn-primary">Verify</button>
+                    <button type="submit" class="btn btn-primary mt-2">Verify</button>
                 </form>
             </div>
         </div>
@@ -37,7 +37,7 @@
     <div class="col-md-8">
         <div class="card">
             <div class="card-header bg-success">
-                <h4>Confirmed Visits (Today & Upcoming)</h4>
+                <h4>Confirmed Visits</h4>
             </div>
             <div class="card-body">
                 @if (!Model.Any())
@@ -46,11 +46,11 @@
                 }
                 else
                 {
-                    <table class="table table-striped">
+                    <table class="table table-bordered">
                         <thead>
                             <tr>
                                 <th>Confirmation ID</th>
-                                <th>Name</th>
+                                <th>Full Name</th>
                                 <th>Company</th>
                                 <th>Purpose</th>
                                 <th>Visit Date</th>
@@ -59,39 +59,30 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var v in Model)
+                            @foreach (var visit in Model)
                             {
                                 <tr>
-                                    <td>@v.ConfirmationId</strong></td>
-                                    <td>@v.FullName</strong></td>
-                                    <td>@v.Company</strong></td>
-                                    <td>@v.Purpose</strong></td>
-                                    <td>@v.VisitDate.ToString("yyyy-MM-dd")</strong></td>
+                                    <td>@visit.ConfirmationId</strong></td>
+                                    <td>@visit.FullName</strong></td>
+                                    <td>@visit.Company</strong></td>
+                                    <td>@visit.Purpose</strong></td>
+                                    <td>@visit.VisitDate.ToString("yyyy-MM-dd")</strong></td>
+                                    <td>@visit.Status</strong></td>
                                     <td>
-                                        @if (v.Status == RequestStatus.Confirmed)
+                                        @if (visit.Status == RequestStatus.Confirmed)
                                         {
-                                            <span class="badge bg-success">Confirmed</span>
-                                        }
-                                        else if (v.Status == RequestStatus.CheckedIn)
-                                        {
-                                            <span class="badge bg-info">Checked In</span>
-                                        }
-                                    </td>
-                                    <td>
-                                        @if (v.Status == RequestStatus.Confirmed)
-                                        {
-                                            <form method="post" asp-action="CheckIn" style="display:inline">
+                                            <form method="post" asp-action="CheckIn">
                                                 @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@v.Id" />
-                                                <button type="submit" class="btn btn-sm btn-primary">Check In</button>
+                                                <input type="hidden" name="id" value="@visit.Id" />
+                                                <button type="submit" class="btn btn-primary btn-sm">Check In</button>
                                             </form>
                                         }
-                                        else if (v.Status == RequestStatus.CheckedIn)
+                                        else if (visit.Status == RequestStatus.CheckedIn)
                                         {
-                                            <form method="post" asp-action="CheckOut" style="display:inline">
+                                            <form method="post" asp-action="CheckOut">
                                                 @Html.AntiForgeryToken()
-                                                <input type="hidden" name="id" value="@v.Id" />
-                                                <button type="submit" class="btn btn-sm btn-secondary">Check Out</button>
+                                                <input type="hidden" name="id" value="@visit.Id" />
+                                                <button type="submit" class="btn btn-secondary btn-sm">Check Out</button>
                                             </form>
                                         }
                                     </td>
