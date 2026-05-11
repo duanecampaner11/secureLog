@@ -59,6 +59,19 @@ public class ClientController : Controller
                 return RedirectToAction("Login", "Account");
             }
             
+            // Set default values for required DateTime fields
+            DateTime visitDate = DateTime.Today.AddDays(7);
+            if (model.VisitDate.HasValue)
+            {
+                visitDate = model.VisitDate.Value;
+            }
+            
+            DateTime visitTime = DateTime.Now;
+            if (model.VisitTime.HasValue)
+            {
+                visitTime = model.VisitTime.Value;
+            }
+            
             var request = new VisitRequest
             {
                 ClientUserId = user.Id,
@@ -66,8 +79,8 @@ public class ClientController : Controller
                 Company = model.Company,
                 Purpose = string.IsNullOrWhiteSpace(model.Purpose) ? "Not specified" : model.Purpose,
                 PersonToMeet = string.IsNullOrWhiteSpace(model.PersonToMeet) ? "Not specified" : model.PersonToMeet,
-                VisitDate = model.VisitDate ?? DateTime.Today.AddDays(7),
-                VisitTime = model.VisitTime ?? DateTime.Now,
+                VisitDate = visitDate,
+                VisitTime = visitTime,
                 Notes = model.Notes,
                 Status = RequestStatus.Pending,
                 RequestedAt = DateTime.UtcNow
