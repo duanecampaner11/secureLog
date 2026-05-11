@@ -20,27 +20,32 @@
     
     <div class="mb-3">
         <label class="form-label">Full Name</label>
-        <input type="text" name="FullName" class="form-control" value="@Model?.FullName" />
+        <input type="text" name="FullName" class="form-control" />
     </div>
     
     <div class="mb-3">
         <label class="form-label">Company</label>
-        <input type="text" name="Company" class="form-control" value="@Model?.Company" />
+        <input type="text" name="Company" class="form-control" />
     </div>
     
     <div class="mb-3">
         <label class="form-label">Purpose of Visit</label>
-        <textarea name="Purpose" class="form-control" rows="3">@Model?.Purpose</textarea>
+        <textarea name="Purpose" class="form-control" rows="3"></textarea>
+    </div>
+    
+    <div class="mb-3">
+        <label class="form-label">Person to Meet</label>
+        <input type="text" name="PersonToMeet" class="form-control" />
     </div>
     
     <div class="mb-3">
         <label class="form-label">Visit Date</label>
-        <input type="date" name="VisitDate" class="form-control" value="@(Model?.VisitDate == default ? "" : Model.VisitDate.ToString("yyyy-MM-dd"))" />
+        <input type="date" name="VisitDate" class="form-control" />
     </div>
     
     <div class="mb-3">
         <label class="form-label">Additional Notes</label>
-        <textarea name="Notes" class="form-control" rows="2">@Model?.Notes</textarea>
+        <textarea name="Notes" class="form-control" rows="2"></textarea>
     </div>
     
     <button type="submit" class="btn btn-primary">Submit Request</button>

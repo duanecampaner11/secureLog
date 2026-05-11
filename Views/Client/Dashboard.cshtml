@@ -37,9 +37,9 @@ else
             @foreach (var request in Model)
             {
                 <tr>
-                    <td>@(request.VisitDate.HasValue ? request.VisitDate.Value.ToString("yyyy-MM-dd") : "Not set")</td>
+                    <td>@request.VisitDate.ToString("yyyy-MM-dd")</td>
                     <td>@request.Purpose</td>
-                    <td>@request.PersonToMeet</td>
+                    <td>@(request.PersonToMeet ?? "Not specified")</td>
                     <td>@request.Status</td>
                     <td>@request.ConfirmationId</td>
                 </tr>

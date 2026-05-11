@@ -63,10 +63,11 @@ public class ClientController : Controller
             {
                 ClientUserId = user.Id,
                 FullName = string.IsNullOrWhiteSpace(model.FullName) ? "Not provided" : model.FullName,
-                Company = model.Company ?? "",
+                Company = model.Company,
                 Purpose = string.IsNullOrWhiteSpace(model.Purpose) ? "Not specified" : model.Purpose,
+                PersonToMeet = string.IsNullOrWhiteSpace(model.PersonToMeet) ? "Not specified" : model.PersonToMeet,
                 VisitDate = model.VisitDate == default ? DateTime.Today : model.VisitDate,
-                Notes = model.Notes ?? "",
+                Notes = model.Notes,
                 Status = RequestStatus.Pending,
                 RequestedAt = DateTime.UtcNow
             };
