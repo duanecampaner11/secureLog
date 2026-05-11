@@ -1,6 +1,8 @@
 ﻿@model List<VisitRequest>
+
 @{
     ViewData["Title"] = "Guard Dashboard";
+    var visits = Model ?? new List<VisitRequest>();
 }
 
 <h2>Guard Dashboard</h2>
@@ -26,14 +28,14 @@
 
 <h3>Confirmed Visits</h3>
 
-@if (!Model.Any())
+@if (!visits.Any())
 {
     <p>No confirmed visits.</p>
 }
 else
 {
     <ul>
-    @foreach (var visit in Model)
+    @foreach (var visit in visits)
     {
         <li>
             <b>@visit.ConfirmationId</b> - @visit.FullName - @visit.Company - @visit.Purpose - @visit.VisitDate.ToString("yyyy-MM-dd")

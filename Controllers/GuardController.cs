@@ -20,14 +20,20 @@ public class GuardController : Controller
     public async Task<IActionResult> Dashboard()
     {
         var today = DateTime.UtcNow.Date;
-        // Show today's visits AND future visits (upcoming 7 days)
         var visits = await _db.VisitRequests
             .Where(v => v.VisitDate.Date >= today && 
                        (v.Status == RequestStatus.Confirmed || v.Status == RequestStatus.CheckedIn))
             .OrderBy(v => v.VisitDate)
             .Take(50)
             .ToListAsync();
-       return View();
+        
+        // Ensure model is never null
+        if (visits == null)
+        {
+            visits = new List<VisitRequest>();
+        }
+        
+        return View(visits);
     }
 
     [HttpPost]
@@ -55,7 +61,6 @@ public class GuardController : Controller
             return RedirectToAction(nameof(Dashboard));
         }
 
-        // Check if visit date is today or future
         if (visit.VisitDate.Date < DateTime.UtcNow.Date)
         {
             TempData["Error"] = $"This confirmation expired on {visit.VisitDate:yyyy-MM-dd}";
