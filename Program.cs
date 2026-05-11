@@ -5,10 +5,14 @@ using SecureLog.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// ===== CRITICAL FOR RENDER: Bind to the correct port =====
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 // Add services to the container
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString));  // Changed from UseMySql to UseNpgsql
+    options.UseNpgsql(connectionString));
 
 // Add Identity services
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
@@ -48,8 +52,12 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// After app.UseAuthorization();
-// Seed Roles
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Guest}/{action=Index}/{id?}");
+app.MapRazorPages();
+
+// Seed Roles and default users
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -95,4 +103,5 @@ using (var scope = app.Services.CreateScope())
         await userManager.AddToRoleAsync(guard, "Guard");
     }
 }
-// Force rebuild - 2026-05-11 16:11:31
+
+app.Run();
