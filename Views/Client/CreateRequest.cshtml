@@ -34,23 +34,8 @@
     </div>
     
     <div class="mb-3">
-        <label class="form-label">Person to Meet</label>
-        <input type="text" name="PersonToMeet" class="form-control" value="@Model?.PersonToMeet" />
-    </div>
-    
-    <div class="row">
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label class="form-label">Visit Date</label>
-                <input type="date" name="VisitDate" class="form-control" />
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label class="form-label">Visit Time</label>
-                <input type="time" name="VisitTime" class="form-control" />
-            </div>
-        </div>
+        <label class="form-label">Visit Date</label>
+        <input type="date" name="VisitDate" class="form-control" value="@(Model?.VisitDate == default ? "" : Model.VisitDate.ToString("yyyy-MM-dd"))" />
     </div>
     
     <div class="mb-3">
